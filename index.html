@@ -11,7 +11,11 @@
 <!-- ============ TOP: CONTACT BAR ============ -->
 <header class="topbar">
   <div class="inner">
-    <div class="brand"><span class="dot"></span> Connect&nbsp;Cleaning</div>
+    <div class="brand">
+      <img id="brandLogo" src="assets/logo.png" alt="Connect Cleaning"
+           onload="this.closest('.brand').classList.add('has-logo')" onerror="this.remove()">
+      <span class="dot"></span><span class="brand-label">Connect&nbsp;Cleaning</span>
+    </div>
     <div class="contact-grid">
       <div class="fld"><label>First name</label><input id="c_first" placeholder="First" autocomplete="off"></div>
       <div class="fld"><label>Last name</label><input id="c_last" placeholder="Last" autocomplete="off"></div>
@@ -102,11 +106,11 @@
         <div class="step-h">3 · Present value as questions, not a speech</div>
         <div class="read">Sounds good. Let me put your estimate together. While I do, can I ask a couple quick things so I know we're the right fit?</div>
         <p class="note">Turn each strength into a question tied to what they told you — they'll sell themselves:</p>
-        <div class="read">You mentioned the kids and the dog are home a lot — does it matter that the products we use around them are non-toxic and safe?</div>
-        <div class="read">Would it be more convenient to have a team of two or three in and out efficiently, rather than one person here most of the day?</div>
+        <div class="read" id="q-products">Does it matter to you that the company you choose uses eco-friendly, non-toxic products that are safe for you and everyone in your home?</div>
+        <div class="read">Would it be more convenient to have a team of two or three in and out efficiently, rather than one person there most of the day?</div>
         <div class="read">How important is it that everyone who enters your home is background checked, and that we're licensed, bonded, and insured?</div>
         <div class="read">That's exactly how we run every job — top to bottom, ceiling fans down to the baseboards, every visit.</div>
-        <details class="branch"><summary>▸ If it's a moving clean</summary>
+        <details class="branch" id="branch-moving"><summary>▸ If it's a moving clean (auto-opens when "moving" is a pain point)</summary>
           <div class="read">And since you're moving, we also clean inside the appliances, drawers, and cabinets, so it's completely move-in ready.</div></details>
       </div>
 
@@ -138,6 +142,8 @@ After that most clients land on biweekly, <span class="slot-biweekly slot">_____
       <div class="step">
         <div class="step-h">6 · Schedule with urgency tied to their reason</div>
         <div class="read"><span class="slot-name slot">[First name]</span>, I can get your first cleaning in before your guests arrive / within a week. Would a morning or an afternoon work better?</div>
+        <p class="note">Set the day &amp; arrival window in the panel → — it fills into your confirmation and close.</p>
+        <div class="read">Perfect — I've got you down for <span class="slot-day slot">[day]</span>, with a <span class="slot-window slot">[arrival window]</span>.</div>
       </div>
       <div class="step">
         <div class="step-h">7 · Confirm payment</div>
@@ -147,60 +153,84 @@ After that most clients land on biweekly, <span class="slot-biweekly slot">_____
       </div>
       <div class="step">
         <div class="step-h">8 · Close warm and low-key</div>
-        <div class="read"><span class="slot-name slot">[First name]</span>, it's been good talking with you. We'll take care of your home on [day] between [time window], and we're looking forward to it. Reach out any time before then if anything comes up.</div>
+        <div class="read"><span class="slot-name slot">[First name]</span>, it's been good talking with you. We'll take care of your home on <span class="slot-day slot">[day]</span>, <span class="slot-window slot">[arrival window]</span>, and we're looking forward to it. Reach out any time before then if anything comes up.</div>
       </div>
     </section>
 
     <!-- ===================== WINDOW CLEANING ===================== -->
     <section class="card svc-section hidden" data-svc="window">
       <div class="step">
-        <div class="step-h">Know your three packages cold</div>
-        <p class="note"><b>Gold</b> (anchor): interior + exterior, screens removed &amp; cleaned, tracks, sills &amp; frames, PLUS whole-house soft wash.<br>
-        <b>Silver</b> (most popular — recommend): interior + exterior, screens cleaned, sills &amp; frames. No tracks/soft wash.<br>
-        <b>Bronze</b> (curb view): exterior windows + screens only.<br>
-        Minimum job is <b>$197</b>. Crew of one or two. If asked how long: "a few factors affect it, plan for at least a few hours." Never give a firm time.</p>
-        <p class="note">Residential: you quote and book. Commercial: collect info and schedule an estimate — do <b>not</b> quote.</p>
+        <div class="step-h">Residential or commercial?</div>
+        <div class="seg">
+          <button class="winmode active" data-mode="resi">Residential</button>
+          <button class="winmode" data-mode="commercial">Commercial</button>
+        </div>
       </div>
-      <div class="step">
-        <div class="step-h">1 · Verify the home</div>
-        <div class="read">I'm showing your home at roughly <span class="slot-sqft slot">_____</span> square feet. Does that sound about right?</div>
-        <p class="note">Window pricing is based on square footage — confirm it in the panel →.</p>
+
+      <!-- COMMERCIAL PATH -->
+      <div class="win-comm hidden">
+        <div class="step">
+          <div class="step-h">Commercial — do not quote, schedule an estimate</div>
+          <div class="read">For a commercial property I'll get some details and set up a time for our owner to take a look, so we get you an accurate number.</div>
+        </div>
+        <div class="step discovery">
+          <div class="step-h">Collect the property details</div>
+          <div class="row"><label>Business / property name</label><input placeholder="Name"></div>
+          <div class="row"><label>Approx. size (sq ft) &amp; number of floors</label><input placeholder="e.g. 6,000 sq ft, 2 stories"></div>
+          <div class="row"><label>What they want cleaned</label><input placeholder="Storefront glass, interior, high panes…"></div>
+          <div class="row"><label>Frequency</label><input placeholder="One-time, monthly, quarterly?"></div>
+        </div>
+        <div class="step">
+          <div class="step-h">Schedule the estimate</div>
+          <div class="read">Let's set a quick time for our owner to take a look. Would earlier in the week or later in the week work better for you?</div>
+        </div>
       </div>
-      <div class="step discovery">
-        <div class="step-h">2 · Discovery</div>
-        <div class="read">What made you decide to get the windows done right now?</div>
-        <p class="note">Now the consequence — pick one:</p>
-        <div class="read">When the afternoon light comes through, is that when the spots and haze bug you the most?</div>
-        <div class="read">How long have the windows been on your list?</div>
-        <p class="note">SWFL angle: hard water, salt air, love bug season, and pollen build up fast — there's usually real buildup to point to.</p>
-        <div class="read">Have you had them done before, or been tackling them yourself?</div>
-        <details class="branch"><summary>▸ If DIY</summary><div class="read">How's that been going with the second-story and the exterior panes?</div></details>
-        <details class="branch"><summary>▸ If exterior-only (Bronze)</summary>
-          <div class="read">Makes sense — the outside is what everyone sees from the street. When you're inside looking out, do the interior panes bug you too, or is it mainly the curb view you're after?</div></details>
-        <div class="chips" id="painChipsWin" hidden></div>
-      </div>
-      <div class="step">
-        <div class="step-h">3 · Present value as questions</div>
-        <div class="read">Just the glass, or the full detail with screens, sills, and frames so they look new — not just wiped down?</div>
-        <div class="read">How important is it that whoever's up on a ladder is licensed, bonded, insured, and background checked?</div>
-      </div>
-      <div class="step">
-        <div class="step-h">4 &amp; 5 · Anchor Gold → land on Silver, guarantee up front</div>
-        <p class="note">Live package pricing is in the panel → ($197 minimum applied automatically).</p>
-        <div class="read">The most complete is our Gold package — full interior and exterior, screens taken out and cleaned, tracks cleaned, sills and frames detailed, plus a whole-house soft wash. A lot of people add that while we're already out there.
+
+      <!-- RESIDENTIAL PATH -->
+      <div class="win-resi">
+        <div class="step">
+          <div class="step-h">Know your three packages cold</div>
+          <p class="note"><b>Gold</b> (anchor): interior + exterior, screens removed &amp; cleaned, tracks, sills &amp; frames, PLUS whole-house soft wash.<br>
+          <b>Silver</b> (most popular — recommend): interior + exterior, screens cleaned, sills &amp; frames. No tracks/soft wash.<br>
+          <b>Bronze</b> (curb view): exterior windows + screens only.<br>
+          Minimum job is <b>$197</b>. Crew of one or two. If asked how long: "a few factors affect it, plan for at least a few hours." Never give a firm time.</p>
+        </div>
+        <div class="step">
+          <div class="step-h">1 · Verify the home</div>
+          <div class="read">I'm showing your home at roughly <span class="slot-sqft slot">_____</span> square feet. Does that sound about right?</div>
+          <p class="note">Window pricing is based on square footage — confirm it in the panel →.</p>
+        </div>
+        <div class="step discovery">
+          <div class="step-h">2 · Discovery</div>
+          <div class="read">What made you decide to get the windows done right now?</div>
+          <p class="note">Now the consequence — pick one:</p>
+          <div class="read">When the afternoon light comes through, is that when the spots and haze bug you the most?</div>
+          <div class="read">How long have the windows been on your to-do list?</div>
+          <p class="note">SWFL angle: hard water, salt air, love bug season, and pollen build up fast — there's usually real buildup to point to.</p>
+          <div class="read">Have you had them done before, or been tackling them yourself?</div>
+          <details class="branch"><summary>▸ If DIY</summary><div class="read">How's that been going with the second-story and the exterior panes?</div></details>
+          <details class="branch"><summary>▸ If exterior-only (Bronze)</summary>
+            <div class="read">Makes sense — the outside is what everyone sees from the street. When you're inside looking out, do the interior panes bug you too, or is it mainly the curb view you're after?</div></details>
+        </div>
+        <div class="step">
+          <div class="step-h">3 · Present value as questions</div>
+          <div class="read">Just the glass, or the full detail with screens, sills, and frames so they look new — not just wiped down?</div>
+          <div class="read">How important is it that whoever's up on a ladder is licensed, bonded, insured, and background checked?</div>
+        </div>
+        <div class="step">
+          <div class="step-h">4 &amp; 5 · Anchor Gold → land on Silver, guarantee up front</div>
+          <p class="note">Live package pricing is in the panel → ($197 minimum applied automatically).</p>
+          <div class="read">The most complete is our Gold package — full interior and exterior, screens taken out and cleaned, tracks cleaned, sills and frames detailed, plus a whole-house soft wash. A lot of people add that while we're already out there.
 Most people go with Silver, and it's the one I'd point you to — same interior and exterior windows, screens cleaned, sills and frames, minus the tracks and soft wash.
 And if you're really just after the curb view, Bronze is exterior windows and screens only.</div>
-        <div class="read">Here's why there's no risk either way: you don't pay until we're done, you've looked them over, and you're happy. If we missed a spot, we make it right before you pay a dollar.</div>
-        <div class="read">Which one sounds most like what you're looking for?</div>
-      </div>
-      <div class="step">
-        <div class="step-h">6–8 · Schedule, payment, close</div>
-        <div class="read"><span class="slot-name slot">[First name]</span>, I can get you on the schedule this week. Mornings or afternoons? … To hold your spot we take a card on file and don't charge it until you're happy. … It's been good talking with you — we'll get your windows taken care of on [day].</div>
-        <details class="branch"><summary>▸ 9 · After the job — earn the review</summary>
-          <div class="read">So glad you're happy with how they turned out. Quick favor — we're a local business trying to serve more neighbors here in SWFL. If you have two minutes, would you leave us a 5-star review on Google? It genuinely helps us grow.</div></details>
-        <details class="branch"><summary>▸ If COMMERCIAL window cleaning</summary>
-          <p class="note">Do not quote. Collect details and schedule an estimate with the owner.</p>
-          <div class="read">For a commercial property I'll get some details and set up a time for our owner to take a look, so we get you an accurate number.</div></details>
+          <div class="read">Here's why there's no risk either way: you don't pay until we're done, you've looked them over, and you're happy. If we missed a spot, we make it right before you pay a dollar.</div>
+          <div class="read">Which one sounds most like what you're looking for?</div>
+        </div>
+        <div class="step">
+          <div class="step-h">6–8 · Schedule, payment, close</div>
+          <div class="read"><span class="slot-name slot">[First name]</span>, I can get you on the schedule this week. Mornings or afternoons? … To hold your spot we take a card on file and don't charge it until you're happy.</div>
+          <div class="read">It's been good talking with you — we'll get your windows taken care of on <span class="slot-day slot">[day]</span>, <span class="slot-window slot">[arrival window]</span>.</div>
+        </div>
       </div>
     </section>
 
@@ -242,6 +272,9 @@ And if you're really just after the curb view, Bronze is exterior windows and sc
         <div class="step-h">Do not quote — collect details, owner follows up</div>
         <div class="read">Happy to help with that. Let me get some details on the property, and our owner will follow up with an estimate.</div>
         <p class="note">Some properties he can quote from satellite/street view, others need a walkthrough — he decides which.</p>
+        <details class="branch"><summary>▸ If it's a commercial property</summary>
+          <div class="read">For a commercial property I'll get some details and set up a time for our owner to take a look, so we get you an accurate number.</div>
+          <p class="note">Same path — collect the details below and the owner follows up. You don't quote it on the call.</p></details>
       </div>
       <div class="step discovery">
         <div class="step-h">Collect the property details</div>
@@ -258,8 +291,6 @@ And if you're really just after the curb view, Bronze is exterior windows and sc
       <div class="step">
         <div class="step-h">Close the call</div>
         <div class="read">Great, I've got what I need. Our owner will take a look and get back to you with an estimate — sometimes from what he can see online, sometimes a quick visit to walk the property. Either way you'll hear from him soon.</div>
-        <details class="branch"><summary>▸ If COMMERCIAL pressure washing</summary>
-          <div class="read">For a commercial property I'll get some details and set up a time for our owner to take a look, so we get you an accurate number.</div></details>
       </div>
     </section>
 
@@ -309,6 +340,21 @@ And if you're really just after the curb view, Bronze is exterior windows and sc
     <div class="card">
       <h3>Live pricing</h3>
       <div class="price-list" id="priceList"></div>
+    </div>
+
+    <div class="card">
+      <h3>Appointment</h3>
+      <label class="rail-lbl">Day</label>
+      <input id="appt_date" type="date" class="appt-input">
+      <label class="rail-lbl">Arrival window</label>
+      <select id="appt_window" class="appt-input">
+        <option value="">—</option>
+        <option>8–10</option>
+        <option>10–12</option>
+        <option>12–2</option>
+        <option>2–4</option>
+      </select>
+      <div class="bucket-tag" style="margin-top:8px">Fills into the schedule &amp; close lines.</div>
     </div>
   </aside>
 </div>

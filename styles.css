@@ -19,6 +19,8 @@ input,select,textarea{font:inherit}
 .topbar .inner{max-width:1180px;margin:0 auto;padding:10px 18px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:9px;font-weight:700;letter-spacing:.2px;white-space:nowrap}
 .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(15,157,143,.25)}
+#brandLogo{height:34px;width:auto;max-width:200px;display:block}
+.brand.has-logo .dot,.brand.has-logo .brand-label{display:none}
 .contact-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;flex:1;min-width:280px}
 .fld{display:flex;flex-direction:column;gap:2px}
 .fld label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:#a9c4dc}
@@ -44,6 +46,15 @@ input,select,textarea{font:inherit}
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .tab{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:8px 15px;font-weight:600}
 .tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* residential / commercial segmented control */
+.seg{display:inline-flex;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:2px}
+.winmode{border:none;background:#fff;color:var(--muted);padding:9px 18px;font-weight:700}
+.winmode.active{background:var(--accent);color:#fff}
+
+/* appointment inputs in the rail */
+.rail-lbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:8px 0 3px}
+.appt-input{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-size:14px}
 
 /* cards & script */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;margin-bottom:14px}

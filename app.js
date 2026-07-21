@@ -13,8 +13,12 @@ const State = {
   favroom: '',
   reason: '',
   windowPkg: 'silver',
-  addons: new Set()
+  addons: new Set(),
+  winMode: 'resi',                 // window cleaning: 'resi' | 'commercial'
+  appt: { date: '', window: '' }   // arrival window: '8–10' | '10–12' | '12–2' | '2–4'
 };
+
+const ARRIVAL_WINDOWS = ['8–10','10–12','12–2','2–4'];
 
 /* ---------- config (integration endpoints) ---------- */
 const CFG_KEY = 'cc_call_cfg';
@@ -80,32 +84,76 @@ function activePainKeys(){
 }
 function painObj(key){ return PAIN_POINTS.find(p=>p.key===key); }
 
-function buildParagraph(){
-  const name = State.contact.first.trim() || 'there';
-  const keys = activePainKeys();
-  const empathies = keys.map(k=>painObj(k)?.empathy).filter(Boolean);
-  const benefit   = keys.map(k=>painObj(k)?.benefit).filter(Boolean)[0]
-                    || 'get your time back and stop thinking about the cleaning';
-  const room = State.favroom.trim();
+function capFirst(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : s; }
 
-  let empathyClause;
-  if(empathies.length===0){
-    const raw=State.painFree.trim()||State.reason.trim();
-    empathyClause = raw ? 'dealing with '+raw.replace(/\.$/,'') : 'juggling a lot right now';
-  } else if(empathies.length===1){
-    empathyClause = empathies[0];
-  } else {
-    empathyClause = empathies.slice(0,2).join(' and also ');
-  }
-
-  let p = `${name}, I know you've been ${empathyClause}. `;
-  p += `Our whole goal is to give you your time back — so you can ${benefit}. `;
-  if(room){
-    p += `You told me ${room} matters most to you, so we're going to take that room top to bottom and make it the place you go to recharge. `;
-  }
-  p += `And when we're done, I'm personally following up to make sure it got the white-glove treatment.`;
-  return p;
+/* Turn a first-person phrase ("my house burnt down") into second person
+   ("your house burnt down") so a typed pain slots into the script naturally. */
+function swapPronouns(t){
+  const map=[
+    [/\bI['’]m\b/gi,'you are'], [/\bI['’]ve\b/gi,'you have'], [/\bI['’]ll\b/gi,'you will'],
+    [/\bI\b/g,'you'], [/\bme\b/gi,'you'], [/\bmy\b/gi,'your'], [/\bmine\b/gi,'yours'],
+    [/\bmyself\b/gi,'yourself'],
+    [/\bwe['’]re\b/gi,'you are'], [/\bwe['’]ve\b/gi,'you have'], [/\bwe\b/gi,'you'],
+    [/\bour\b/gi,'your'], [/\bours\b/gi,'yours'], [/\bus\b/gi,'you']
+  ];
+  let s=t; for(const [re,rep] of map) s=s.replace(re,rep); return s;
 }
+
+function buildParagraph(){
+  const first = State.contact.first.trim();
+  const namePrefix = first ? first + ', ' : '';
+  const keys = activePainKeys();
+  const room = State.favroom.trim();
+  const roomLine = room
+    ? `You told me ${room} matters most to you, so we're going to take that room top to bottom and make it the place you go to recharge. `
+    : '';
+  const followUp = `And when we're done, I'm personally following up to make sure it got the white-glove treatment.`;
+
+  const empathies = keys.map(k=>painObj(k)?.empathy).filter(Boolean);
+  if(empathies.length){
+    const benefit = keys.map(k=>painObj(k)?.benefit).filter(Boolean)[0] || 'have one less thing on your plate';
+    const empathyClause = empathies.length===1 ? empathies[0] : empathies.slice(0,2).join(' and also ');
+    let p = capFirst(`${namePrefix}I know you've been ${empathyClause}. `);
+    p += `Our whole goal is to give you your time back — so you can ${benefit}. `;
+    return p + roomLine + followUp;
+  }
+
+  // A typed phrase that didn't match a preset pain point.
+  const raw = (State.painFree.trim() || State.reason.trim()).replace(/[.\s]+$/,'');
+  if(raw){
+    const swapped = swapPronouns(raw);
+    let p = capFirst(`${namePrefix}I know ${swapped} — and that's a lot to have on your plate right now. `);
+    p += `Our whole goal is to take the cleaning off your list so it's one less thing you have to think about. `;
+    return p + roomLine + followUp;
+  }
+
+  // Nothing captured yet.
+  let p = capFirst(`${namePrefix}Our whole goal is to give you your time back, so you can focus on everything else you've got going on instead of the cleaning. `);
+  return p + roomLine + followUp;
+}
+
+/* Step-3 products question adapts to pets / kids-baby pain points. */
+function renderProductsQuestion(){
+  const el=$('#q-products'); if(!el) return;
+  const keys=activePainKeys();
+  const pets=keys.includes('pets');
+  const child = keys.includes('baby') || /\b(kid|kids|child|children|toddler|little one|little ones)\b/i.test(State.painFree);
+  let t;
+  if(pets && child) t="You mentioned you've got a little one and pets at home — does it matter to you that the products we use around them are eco-friendly, non-toxic, and safe?";
+  else if(pets) t="You mentioned you've got pets at home — does it matter to you that the products we use around them are eco-friendly, non-toxic, and safe?";
+  else if(child) t="You mentioned there's a little one at home — does it matter to you that the products we use around them are eco-friendly, non-toxic, and safe?";
+  else t="Does it matter to you that the company you choose uses eco-friendly, non-toxic products that are safe for you and everyone in your home?";
+  el.textContent=t;
+}
+
+/* Auto-expand the moving-clean lines when "moving" is a pain point. */
+function renderMovingBranch(){
+  const d=$('#branch-moving'); if(!d) return;
+  if(activePainKeys().includes('moving')) d.setAttribute('open',''); else d.removeAttribute('open');
+}
+
+function onPainsChanged(){ renderRephrase(); renderProductsQuestion(); renderMovingBranch(); }
+
 function renderRephrase(){
   $('#rephraseOut').textContent = buildParagraph();
 }
@@ -170,11 +218,21 @@ function renderPricing(){
 }
 
 /* ---------- render: name slots + inline bindings ---------- */
+function prettyDay(iso){
+  if(!iso) return '';
+  const d=new Date(iso+'T00:00:00');
+  if(isNaN(d)) return '';
+  return d.toLocaleDateString('en-US',{weekday:'long', month:'short', day:'numeric'});
+}
 function renderBindings(){
   const nm = State.contact.first.trim() || '[First name]';
   $$('.slot-name').forEach(el=>el.textContent=nm);
   const sq = State.sqft!=null&&!isNaN(State.sqft) ? State.sqft.toLocaleString() : '_____';
   $$('.slot-sqft').forEach(el=>el.textContent=sq);
+  const day = prettyDay(State.appt.date) || '[day]';
+  const win = State.appt.window ? State.appt.window+' arrival' : '[arrival window]';
+  $$('.slot-day').forEach(el=>el.textContent=day);
+  $$('.slot-window').forEach(el=>el.textContent=win);
   // house pricing slots inside the read-aloud lines
   if(State.service==='house'){
     const b=bucketFor(State.sqft);
@@ -193,6 +251,15 @@ function switchService(svc){
   $$('.tab').forEach(t=>t.classList.toggle('active', t.dataset.svc===svc));
   $$('.svc-section').forEach(s=>s.classList.toggle('hidden', s.dataset.svc!==svc));
   renderPricing(); renderBindings();
+}
+
+/* Window cleaning: residential vs commercial paths */
+function setWinMode(mode){
+  State.winMode=mode;
+  $$('.winmode').forEach(b=>b.classList.toggle('active', b.dataset.mode===mode));
+  $$('.win-resi').forEach(el=>el.classList.toggle('hidden', mode!=='resi'));
+  $$('.win-comm').forEach(el=>el.classList.toggle('hidden', mode!=='commercial'));
+  renderPricing();
 }
 
 /* ---------- integration actions ---------- */
@@ -243,7 +310,9 @@ function callSummary(outcome){
     painPoints: activePainKeys().map(k=>painObj(k)?.label).filter(Boolean),
     painPhrase: State.painFree, favoriteRoom:State.favroom, reason:State.reason,
     closingParagraph: buildParagraph(),
-    addons:[...State.addons], windowPackage: State.service==='window'?State.windowPkg:null
+    addons:[...State.addons], windowPackage: State.service==='window'?State.windowPkg:null,
+    windowMode: State.service==='window'?State.winMode:null,
+    appointment: { date: State.appt.date||null, arrivalWindow: State.appt.window||null, dayLabel: prettyDay(State.appt.date)||null }
   };
 }
 async function doOutcome(kind){
@@ -283,7 +352,7 @@ function buildPainChips(){
     c.className='chip'; c.textContent=p.label; c.dataset.key=p.key;
     c.addEventListener('click',()=>{
       if(State.pains.has(p.key)) State.pains.delete(p.key); else State.pains.add(p.key);
-      c.classList.toggle('on'); renderRephrase();
+      c.classList.toggle('on'); onPainsChanged();
     });
     wrap.appendChild(c);
   });
@@ -315,11 +384,16 @@ function wire(){
 
   // tabs
   $$('.tab').forEach(t=>t.addEventListener('click',()=>switchService(t.dataset.svc)));
+  // window residential / commercial toggle
+  $$('.winmode').forEach(b=>b.addEventListener('click',()=>setWinMode(b.dataset.mode)));
+  // appointment day + arrival window
+  $('#appt_date') && $('#appt_date').addEventListener('input',e=>{State.appt.date=e.target.value; renderBindings();});
+  $('#appt_window') && $('#appt_window').addEventListener('change',e=>{State.appt.window=e.target.value; renderBindings();});
 
   // discovery
   $('#d_reason') && $('#d_reason').addEventListener('input',e=>{State.reason=e.target.value; renderRephrase();});
   $('#d_favroom') && $('#d_favroom').addEventListener('input',e=>{State.favroom=e.target.value; renderRephrase(); renderBindings();});
-  $('#painFree') && $('#painFree').addEventListener('input',e=>{State.painFree=e.target.value; renderRephrase();});
+  $('#painFree') && $('#painFree').addEventListener('input',e=>{State.painFree=e.target.value; onPainsChanged();});
 
   // window package select
   $$('.wpkg').forEach(r=>r.addEventListener('change',e=>{State.windowPkg=e.target.value;}));
@@ -343,5 +417,5 @@ function wire(){
 /* ---------- init ---------- */
 document.addEventListener('DOMContentLoaded',()=>{
   buildPainChips(); buildAddons(); wire();
-  switchService('house'); renderRephrase(); renderPricing(); renderBindings();
+  switchService('house'); setWinMode('resi'); onPainsChanged(); renderPricing(); renderBindings();
 });

@@ -18,6 +18,10 @@ export default async function handler(req, res) {
   }
   const name = `${s.contact?.firstName || ''} ${s.contact?.lastName || ''}`.trim() || 'New customer';
   const reason = s.painPhrase || (s.painPoints || []).join(', ') || '—';
+  const appt = s.appointment || {};
+  const apptLabel = appt.dayLabel
+    ? `${appt.dayLabel}${appt.arrivalWindow ? ', ' + appt.arrivalWindow + ' arrival' : ''}`
+    : 'not set';
   const results = {};
 
   try {
@@ -28,6 +32,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           text: `:broom: *Needs Scheduled* — ${name}\n` +
                 `${s.service || 'service'} · ${s.squareFeet || '?'} sq ft · ${s.contact?.phone || 'no phone'}\n` +
+                `Requested: ${apptLabel}\n` +
                 `Reason: ${reason}`
         })
       });
@@ -47,15 +52,58 @@ export default async function handler(req, res) {
             name: `Schedule: ${name} (${s.service}, ${s.squareFeet || '?'} sq ft)`,
             notes: `Phone: ${s.contact?.phone}\nEmail: ${s.contact?.email}\n` +
                    `Address: ${s.contact?.address}\nBucket: ${s.bucket}\n` +
-                   `Reason: ${reason}\n\n${s.closingParagraph || ''}`
+                   `Requested: ${apptLabel}\nReason: ${reason}\n\n${s.closingParagraph || ''}`
           }
         })
       });
       results.asana = r.ok ? 'created' : `error ${r.status}`;
     } else results.asana = 'skipped (no ASANA_TOKEN/ASANA_PROJECT)';
 
+    // Optional: create the actual job in Housecall Pro.
+    // HCP's booking/job creation needs more than a token — you must map the
+    // service to an HCP job type and the arrival window to HCP's scheduling
+    // fields. Fill in HCP_TOKEN + the job-type id below to turn this on.
+    if (process.env.HCP_TOKEN && process.env.HCP_JOB_TYPE_ID) {
+      results.hcp = await bookHcpJob(s, appt).catch(e => 'error: ' + String(e));
+    } else {
+      results.hcp = 'skipped (set HCP_TOKEN + HCP_JOB_TYPE_ID to auto-create the job)';
+    }
+
     return res.status(200).json({ ok: true, results });
   } catch (e) {
     return res.status(502).json({ error: 'Request failed', detail: String(e), results });
   }
+}
+
+/* ---- Housecall Pro job creation (scaffold) ---------------------------------
+ * Maps the arrival windows (8–10, 10–12, 12–2, 2–4) to start/end times on the
+ * chosen day and creates a scheduled job. Verify field names against your HCP
+ * API access — HCP's write/booking endpoints vary by plan and require the
+ * customer + address to exist first. This is a starting point, not turnkey. */
+const HCP_WINDOWS = {
+  '8–10':  ['08:00', '10:00'], '10–12': ['10:00', '12:00'],
+  '12–2':  ['12:00', '14:00'], '2–4':   ['14:00', '16:00']
+};
+async function bookHcpJob(summary, appt) {
+  if (!appt.date || !appt.arrivalWindow) return 'skipped (no day/arrival window chosen)';
+  const win = HCP_WINDOWS[appt.arrivalWindow];
+  if (!win) return 'skipped (unknown arrival window)';
+  const start = `${appt.date}T${win[0]}:00`;
+  const end   = `${appt.date}T${win[1]}:00`;
+
+  const r = await fetch('https://api.housecallpro.com/jobs', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.HCP_TOKEN}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      // TODO: create/lookup the customer first and pass customer_id + address_id.
+      job_type_id: process.env.HCP_JOB_TYPE_ID,
+      schedule: { scheduled_start: start, scheduled_end: end, arrival_window_minutes: 120 },
+      note: summary.closingParagraph || '',
+      work_status: 'scheduled'
+    })
+  });
+  return r.ok ? 'job created' : `error ${r.status}`;
 }
