@@ -12,6 +12,10 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
   const s = req.body || {};
+  // Only the "booked" outcome should ever trigger the Needs-Scheduled cadence.
+  if (s.outcome && s.outcome !== 'booked') {
+    return res.status(200).json({ ok: true, results: { skipped: `outcome=${s.outcome}` } });
+  }
   const name = `${s.contact?.firstName || ''} ${s.contact?.lastName || ''}`.trim() || 'New customer';
   const reason = s.painPhrase || (s.painPoints || []).join(', ') || '—';
   const results = {};

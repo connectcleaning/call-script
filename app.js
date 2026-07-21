@@ -248,14 +248,17 @@ function callSummary(outcome){
 }
 async function doOutcome(kind){
   const summary=callSummary(kind);
-  let url = kind==='booked' ? CFG.bookedUrl : (kind==='estimate' ? CFG.hcpUrl : CFG.bookedUrl||CFG.hcpUrl);
+  // Declined never fires booking/estimate automation — it's just recorded.
+  const url = kind==='booked' ? CFG.bookedUrl : (kind==='estimate' ? CFG.hcpUrl : '');
   const label = {declined:'Declined',estimate:'Estimate → HCP email',booked:'Booked → Needs-Scheduled cadence'}[kind];
   if(url){
     try{ await postJSON(url, summary); toast(label+' sent ✓'); }
     catch(e){ toast(label+' failed: '+e.message, true); }
   } else {
     await copyText(JSON.stringify(summary,null,2));
-    toast('No webhook set for this outcome (Settings) — call summary copied to clipboard');
+    toast(kind==='declined'
+      ? 'Marked declined — call summary copied for your notes'
+      : 'No webhook set for this outcome (Settings) — call summary copied to clipboard');
   }
 }
 
