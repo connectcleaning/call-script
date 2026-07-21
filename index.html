@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect Cleaning — Live Call Script</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============ TOP: CONTACT BAR ============ -->
+<header class="topbar">
+  <div class="inner">
+    <div class="brand"><span class="dot"></span> Connect&nbsp;Cleaning</div>
+    <div class="contact-grid">
+      <div class="fld"><label>First name</label><input id="c_first" placeholder="First" autocomplete="off"></div>
+      <div class="fld"><label>Last name</label><input id="c_last" placeholder="Last" autocomplete="off"></div>
+      <div class="fld"><label>Phone</label><input id="c_phone" placeholder="(239) …" autocomplete="off"></div>
+      <div class="fld"><label>Email</label><input id="c_email" placeholder="name@email.com" autocomplete="off"></div>
+      <div class="fld addr-row"><label>Address</label><input id="c_address" placeholder="Street, city" autocomplete="off">
+        <div class="mini"><button id="btnLookup" title="Look up square footage from address">⌂ sq ft</button></div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="btn" id="btnSaveContact">Save&nbsp;to&nbsp;GHL</button>
+      <button class="gear" id="gear" title="Integration settings">⚙</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- ============ LEFT: SCRIPT ============ -->
+  <main>
+    <div class="tabs">
+      <button class="tab active" data-svc="house">House Cleaning</button>
+      <button class="tab" data-svc="window">Window Cleaning</button>
+      <button class="tab" data-svc="airbnb">Airbnb / Turnover</button>
+      <button class="tab" data-svc="pressure">Pressure Washing</button>
+      <button class="tab" data-svc="commercial">Commercial / HOA</button>
+    </div>
+
+    <!-- Opening (shared) -->
+    <section class="card">
+      <div class="step">
+        <div class="step-h">All calls — start here</div>
+        <p class="note">Answer with a smile. It genuinely changes how you sound.</p>
+        <div class="read">Hi, thanks for calling Connect Cleaning! This is _______. How can I help you today?</div>
+        <details class="branch"><summary>▸ If the service isn't clear</summary>
+          <div class="read">And what can we help you with — house cleaning, window cleaning, pressure washing, or something else?</div>
+        </details>
+        <p class="note">Collect all five up top (fields above): first, last, phone, email, address. If the call drops, this is what lets you follow up.</p>
+        <ul class="bullets">
+          <li><b>Phone</b> — "Is this the best number to reach you at?" Repeat it back from your call display to catch typos.</li>
+          <li><b>Email</b> — "We send receipts and estimates through email, may I have yours?"</li>
+          <li><b>Address</b> — "I can usually find the home details I need for your estimate online. What's your address?" → then hit <b>⌂ sq ft</b>.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===================== HOUSE CLEANING ===================== -->
+    <section class="card svc-section" data-svc="house">
+      <div class="step">
+        <div class="step-h">1 · Verify the home</div>
+        <div class="read">I'm showing roughly <span class="slot-sqft slot">_____</span> square feet. Does that sound about right?</div>
+        <p class="note">Confirm the sq ft in the pricing panel →. Customers underestimate their own homes.</p>
+      </div>
+
+      <div class="step discovery">
+        <div class="step-h">2 · Discovery — find the real reason &amp; what it's costing them</div>
+        <p class="note">This is where the sale is made. If they haven't said why they're calling:</p>
+        <div class="read">What made you decide to get the home cleaned right now?</div>
+        <div class="row"><label>Their reason / situation (feeds the closing paragraph)</label>
+          <input id="d_reason" placeholder="e.g. guests coming for the holidays"></div>
+        <p class="note">Dig into the consequence — let them feel the cost. Pick one:</p>
+        <ul class="bullets">
+          <li>"If it stayed the way it is now, what would that look like when the guests arrive / when you're trying to rest?"</li>
+          <li>"How long has this been on your list that you keep meaning to get to?"</li>
+        </ul>
+        <div class="read">What have you already tried?</div>
+        <details class="branch"><summary>▸ If they used a cleaning company before</summary>
+          <div class="read">What did you like, and what would you want done differently this time?</div></details>
+        <details class="branch"><summary>▸ If they tried doing it themselves</summary>
+          <div class="read">Why do you think that hasn't stuck?</div></details>
+        <details class="branch"><summary>▸ If they only want a partial clean (bathrooms / floors / baseboards)</summary>
+          <p class="note">Don't lock into the small job. Give them a judgment-free way to admit the rest slips:</p>
+          <div class="read">Makes sense on the bathrooms and floors. And the rest — the dusting, cabinets, baseboards — are you keeping up with that yourself, or is that the kind of thing that tends to pile up?</div>
+          <p class="note">If they admit it's slipping, go to the widening trial close:</p>
+          <div class="read">If we could just keep the whole home clean for you, would that take a weight off your shoulders?</div>
+          <p class="note">If they hold firm on two rooms, book the two rooms and earn the rest later. Never push past a clear no.</p>
+        </details>
+        <div class="read">What's the one thing we could take care of that would make this a 5-star experience for you?</div>
+        <div class="row"><label>Their "favorite room" / 5-star answer (used in the bridge)</label>
+          <input id="d_favroom" placeholder="e.g. the kitchen, the master bath"></div>
+        <p class="note">Offer examples only if they stall: pet hair, soap buildup in the shower, grease in the oven.</p>
+      </div>
+
+      <div class="step">
+        <div class="step-h">3 · Present value as questions, not a speech</div>
+        <div class="read">Sounds good. Let me put your estimate together. While I do, can I ask a couple quick things so I know we're the right fit?</div>
+        <ul class="bullets">
+          <li>"You mentioned the kids and the dog are home a lot — does it matter that the products we use around them are non-toxic and safe?"</li>
+          <li>"Would it be more convenient to have a team of two or three in and out efficiently, rather than one person here most of the day?"</li>
+          <li>"How important is it that everyone who enters your home is background checked, and that we're licensed, bonded, and insured?"</li>
+        </ul>
+        <div class="read">That's exactly how we run every job — top to bottom, ceiling fans down to the baseboards, every visit.</div>
+        <details class="branch"><summary>▸ If it's a moving clean</summary>
+          <div class="read">And since you're moving, we also clean inside the appliances, drawers, and cabinets, so it's completely move-in ready.</div></details>
+      </div>
+
+      <div class="step">
+        <div class="step-h">4 · Bridge their situation to the service <span class="pill">LIVE</span></div>
+        <p class="note">Select the pain points below (or type a phrase) — the closing paragraph in the panel → rewrites itself instantly. Read it aloud.</p>
+        <div class="chips" id="painChips"></div>
+        <div class="row discovery"><label>…or type it in their words</label>
+          <input id="painFree" placeholder='e.g. "upcoming knee surgery"'></div>
+        <p class="note">Then get a yes on the outcome before any number:</p>
+        <div class="read">If we could take all of that off your plate for you, would that make a real difference?</div>
+      </div>
+
+      <div class="step">
+        <div class="step-h">5 · Present pricing with the guarantee up front</div>
+        <p class="note">Live numbers are in the panel →. Lead with <b>biweekly</b> as the recommendation; give weekly/monthly only if asked.</p>
+        <div class="read">A one-time cleaning — what people do for a special occasion or the holidays — would be <span class="slot-onetime slot">_____</span>.
+Most clients save by going on a recurring schedule. No contract, cancel anytime, and it lets me build in savings for you.
+The first visit is a little more because it brings the home up to our standard — that initial cleaning is <span class="slot-initial slot">_____</span>.
+After that most clients land on biweekly, <span class="slot-biweekly slot">_____</span>, because it keeps the home consistently clean without paying for weekly.</div>
+        <div class="read">Here's why there's no risk: you don't pay a thing until the cleaning's done and you've walked through and told us it looks great. If anything's not right, we make it right before you pay a dollar. That's our guarantee.</div>
+        <div class="read">Which option sounds best for you?</div>
+        <div class="discovery"><label style="font-size:12px;font-weight:600;color:var(--muted)">Optional add-ons</label>
+          <div class="chips" id="addonChips"></div></div>
+      </div>
+
+      <div class="step">
+        <div class="step-h">6 · Schedule with urgency tied to their reason</div>
+        <div class="read"><span class="slot-name slot">[First name]</span>, I can get your first cleaning in before your guests arrive / within a week. Would a morning or an afternoon work better?</div>
+      </div>
+      <div class="step">
+        <div class="step-h">7 · Confirm payment</div>
+        <div class="read"><span class="slot-name slot">[First name]</span>, we keep payment simple — the way we hold your spot is a card on file, and we don't charge it until the job's done and you're happy. Can I grab that now so I'm not bothering you later?</div>
+        <details class="branch"><summary>▸ If they're driving / can't right now</summary>
+          <div class="read">No problem — I'll text you a secure link. If you add it today, that locks in your appointment.</div></details>
+      </div>
+      <div class="step">
+        <div class="step-h">8 · Close warm and low-key</div>
+        <div class="read"><span class="slot-name slot">[First name]</span>, it's been good talking with you. We'll take care of your home on [day] between [time window], and we're looking forward to it. Reach out any time before then if anything comes up.</div>
+      </div>
+    </section>
+
+    <!-- ===================== WINDOW CLEANING ===================== -->
+    <section class="card svc-section hidden" data-svc="window">
+      <div class="step">
+        <div class="step-h">Know your three packages cold</div>
+        <p class="note"><b>Gold</b> (anchor): interior + exterior, screens removed &amp; cleaned, tracks, sills &amp; frames, PLUS whole-house soft wash.<br>
+        <b>Silver</b> (most popular — recommend): interior + exterior, screens cleaned, sills &amp; frames. No tracks/soft wash.<br>
+        <b>Bronze</b> (curb view): exterior windows + screens only.<br>
+        Minimum job is <b>$197</b>. Crew of one or two. If asked how long: "a few factors affect it, plan for at least a few hours." Never give a firm time.</p>
+        <p class="note">Residential: you quote and book. Commercial: collect info and schedule an estimate — do <b>not</b> quote.</p>
+      </div>
+      <div class="step">
+        <div class="step-h">1 · Verify the home</div>
+        <div class="read">I'm showing your home at roughly <span class="slot-sqft slot">_____</span> square feet. Does that sound about right?</div>
+        <p class="note">Window pricing is based on square footage — confirm it in the panel →.</p>
+      </div>
+      <div class="step discovery">
+        <div class="step-h">2 · Discovery</div>
+        <div class="read">What made you decide to get the windows done right now?</div>
+        <ul class="bullets">
+          <li>"When the afternoon light comes through, is that when the spots and haze bug you the most?"</li>
+          <li>"How long have the windows been on your list?"</li>
+        </ul>
+        <p class="note">SWFL angle: hard water, salt air, love bug season, and pollen build up fast — there's usually real buildup to point to.</p>
+        <div class="read">Have you had them done before, or been tackling them yourself?</div>
+        <details class="branch"><summary>▸ If DIY</summary><div class="read">How's that been going with the second-story and the exterior panes?</div></details>
+        <details class="branch"><summary>▸ If exterior-only (Bronze)</summary>
+          <div class="read">Makes sense — the outside is what everyone sees from the street. When you're inside looking out, do the interior panes bug you too, or is it mainly the curb view you're after?</div></details>
+        <div class="chips" id="painChipsWin" hidden></div>
+      </div>
+      <div class="step">
+        <div class="step-h">3 · Present value as questions</div>
+        <ul class="bullets">
+          <li>"Just the glass, or the full detail with screens, sills, and frames so they look new — not just wiped down?"</li>
+          <li>"How important is it that whoever's up on a ladder is licensed, bonded, insured, and background checked?"</li>
+        </ul>
+      </div>
+      <div class="step">
+        <div class="step-h">4 &amp; 5 · Anchor Gold → land on Silver, guarantee up front</div>
+        <p class="note">Live package pricing is in the panel → ($197 minimum applied automatically).</p>
+        <div class="read">The most complete is our Gold package — full interior and exterior, screens taken out and cleaned, tracks cleaned, sills and frames detailed, plus a whole-house soft wash. A lot of people add that while we're already out there.
+Most people go with Silver, and it's the one I'd point you to — same interior and exterior windows, screens cleaned, sills and frames, minus the tracks and soft wash.
+And if you're really just after the curb view, Bronze is exterior windows and screens only.</div>
+        <div class="read">Here's why there's no risk either way: you don't pay until we're done, you've looked them over, and you're happy. If we missed a spot, we make it right before you pay a dollar.</div>
+        <div class="read">Which one sounds most like what you're looking for?</div>
+      </div>
+      <div class="step">
+        <div class="step-h">6–8 · Schedule, payment, close</div>
+        <div class="read"><span class="slot-name slot">[First name]</span>, I can get you on the schedule this week. Mornings or afternoons? … To hold your spot we take a card on file and don't charge it until you're happy. … It's been good talking with you — we'll get your windows taken care of on [day].</div>
+        <details class="branch"><summary>▸ 9 · After the job — earn the review</summary>
+          <div class="read">So glad you're happy with how they turned out. Quick favor — we're a local business trying to serve more neighbors here in SWFL. If you have two minutes, would you leave us a 5-star review on Google? It genuinely helps us grow.</div></details>
+        <details class="branch"><summary>▸ If COMMERCIAL window cleaning</summary>
+          <p class="note">Do not quote. Collect details and schedule an estimate with the owner.</p>
+          <div class="read">For a commercial property I'll get some details and set up a time for our owner to take a look, so we get you an accurate number.</div></details>
+      </div>
+    </section>
+
+    <!-- ===================== AIRBNB / TURNOVER ===================== -->
+    <section class="card svc-section hidden" data-svc="airbnb">
+      <div class="step">
+        <div class="step-h">Do not quote — collect detail, Darius follows up today</div>
+        <div class="read">Happy to help with your turnover cleaning. Let me get some details about the property, and our owner will get back to you today with pricing.</div>
+        <p class="note">Say "today" only if you can keep it. Hitting a same-day promise is a big trust builder on turnover work.</p>
+      </div>
+      <div class="step discovery">
+        <div class="step-h">Collect the property details</div>
+        <div class="row"><label>Bedrooms</label><input placeholder="How many bedrooms?"></div>
+        <div class="row"><label>Total beds (incl. pull-outs / air mattresses)</label><input placeholder="Beds drive the linen work — the real labor"></div>
+        <div class="row"><label>Bathrooms</label><input placeholder="How many bathrooms?"></div>
+        <div class="row"><label>Square footage</label><input placeholder="About how many sq ft?"></div>
+        <div class="row"><label>Urgency / guests booked</label><input placeholder="First clean date? Same-day checkout+checkin?"></div>
+        <p class="note">Same-day turnover changes scheduling — flag it clearly in your notes.</p>
+      </div>
+      <div class="step discovery">
+        <div class="step-h">Useful extras (each saves a follow-up call)</div>
+        <ul class="bullets">
+          <li>Do you supply linens/towels, or want us to handle laundry on site?</li>
+          <li>Roughly how many turnovers per month?</li>
+          <li>Lockbox or smart lock for access?</li>
+          <li>Do you restock consumables (paper, soap, coffee) — want us doing that?</li>
+        </ul>
+      </div>
+      <div class="step">
+        <div class="step-h">Close the call</div>
+        <div class="read">Perfect, I've got everything I need. Our owner will reach out today with pricing. He'll have your number and email — if anything changes on your end, just give us a call.</div>
+        <p class="note">Log it and hand to Darius the same day. Turnover leads go cold fast — they're usually shopping several cleaners at once.</p>
+      </div>
+    </section>
+
+    <!-- ===================== PRESSURE WASHING ===================== -->
+    <section class="card svc-section hidden" data-svc="pressure">
+      <div class="step">
+        <div class="step-h">Do not quote — collect details, owner follows up</div>
+        <div class="read">Happy to help with that. Let me get some details on the property, and our owner will follow up with an estimate.</div>
+        <p class="note">Some properties he can quote from satellite/street view, others need a walkthrough — he decides which.</p>
+      </div>
+      <div class="step discovery">
+        <div class="step-h">Collect the property details</div>
+        <div class="row"><label>Square footage</label><input placeholder="About how many sq ft?"></div>
+        <div class="row"><label>Surfaces they asked for</label><input placeholder="Which areas to clean?"></div>
+        <div class="row"><label>Urgency</label><input placeholder="A date they're working toward?"></div>
+      </div>
+      <div class="step">
+        <div class="step-h">Ask about the other surfaces (biggest way the job grows)</div>
+        <div class="read">While we're out there, are there any other areas you'd want us to take a look at? A lot of people have us do a few things at once since we're already on site.</div>
+        <ul class="bullets"><li>Driveway / walkways</li><li>House soft wash (whole exterior)</li><li>Gutters</li><li>Fencing</li><li>Roof</li></ul>
+        <p class="note">Read them as options, not an upsell. "Since we're already on site" makes it feel like convenience.</p>
+      </div>
+      <div class="step">
+        <div class="step-h">Close the call</div>
+        <div class="read">Great, I've got what I need. Our owner will take a look and get back to you with an estimate — sometimes from what he can see online, sometimes a quick visit to walk the property. Either way you'll hear from him soon.</div>
+        <details class="branch"><summary>▸ If COMMERCIAL pressure washing</summary>
+          <div class="read">For a commercial property I'll get some details and set up a time for our owner to take a look, so we get you an accurate number.</div></details>
+      </div>
+    </section>
+
+    <!-- ===================== COMMERCIAL / HOA ===================== -->
+    <section class="card svc-section hidden" data-svc="commercial">
+      <div class="step">
+        <div class="step-h">Do not quote — book a walkthrough before the call ends</div>
+        <div class="read">Happy to help. For a commercial property the best next step is a quick walkthrough so we can put together an accurate proposal. Let me get a few details and then find a time that works for you.</div>
+        <p class="note">Booking the walkthrough on the call is the whole goal. A commercial lead that hangs up without a scheduled time usually goes quiet.</p>
+      </div>
+      <div class="step discovery">
+        <div class="step-h">Collect the property details</div>
+        <div class="row"><label>Business / association name</label><input placeholder="Name of the business or association"></div>
+        <div class="row"><label>Property size (sq ft)</label><input placeholder="About how large?"></div>
+        <div class="row"><label>Frequency</label><input placeholder="Daily, a few times a week, weekly?"></div>
+        <div class="row"><label>Point of contact</label><input placeholder="Confirm it's the same person from the top of the call"></div>
+      </div>
+      <div class="step discovery">
+        <div class="step-h">Useful extras</div>
+        <ul class="bullets">
+          <li>Type of property? Office, medical, retail, clubhouse, common areas?</li>
+          <li>Currently with another company, or new service? <i>(If switching, ask what's not working — most useful thing on the proposal.)</i></li>
+          <li>A date they're hoping to start by?</li>
+        </ul>
+      </div>
+      <div class="step">
+        <div class="step-h">Book the walkthrough</div>
+        <div class="read">Let's get our owner out to see the property. Would earlier in the week or later in the week work better for you?</div>
+        <div class="read">Perfect, I've got you down for [day and time]. He'll walk the property with you and follow up with a proposal. You'll get a confirmation by email.</div>
+        <p class="note">Offer a narrow choice, not an open calendar. Book it on Darius's calendar while they're still on the phone.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ RIGHT: LIVE RAIL ============ -->
+  <aside class="rail">
+    <div class="card">
+      <h3>Square footage</h3>
+      <div class="sqft-line">
+        <input id="sqft" type="number" inputmode="numeric" placeholder="0" min="0">
+        <span>sq ft</span>
+        <button class="copybtn" id="btnLookup2" style="margin:0 0 0 auto">⌂ from address</button>
+      </div>
+      <div class="bucket-tag" id="bucketTag"></div>
+    </div>
+
+    <div class="card">
+      <h3>Live pricing</h3>
+      <div class="price-list" id="priceList"></div>
+    </div>
+
+    <div class="card">
+      <h3>Closing paragraph <span class="pill">AI</span></h3>
+      <div class="rephrase-box" id="rephraseOut"></div>
+      <div style="display:flex;gap:6px">
+        <button class="copybtn" id="copyRephrase">⧉ Copy</button>
+        <button class="copybtn" id="aiBtn">✨ AI polish</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- ============ BOTTOM: OUTCOME BAR ============ -->
+<footer class="outcome">
+  <div class="inner">
+    <span class="lbl">Call outcome</span>
+    <button class="oc declined" id="ocDeclined">Declined</button>
+    <button class="oc maybe" id="ocMaybe">Maybe · send estimate (HCP email)</button>
+    <button class="oc booked" id="ocBooked">Booked · Needs-Scheduled cadence</button>
+    <span class="oc-note">Sends the full call summary to your connected tools (Settings ⚙).</span>
+  </div>
+</footer>
+
+<!-- ============ SETTINGS MODAL ============ -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h2>Integration settings</h2>
+    <p class="sub">Paste a webhook / API URL for each action. Anything left blank falls back to a manual step (copy to clipboard, or open a property search). Saved in this browser only.</p>
+    <div class="cfg"><label>GHL contact webhook <small>— "Save to GHL" POSTs {firstName,lastName,phone,email,address}</small></label><input id="cfg_ghl" placeholder="https://…"></div>
+    <div class="cfg"><label>Square-footage lookup URL <small>— POST {address}, return {sqft}</small></label><input id="cfg_sqft" placeholder="https://…"></div>
+    <div class="cfg"><label>HCP estimate webhook <small>— "Maybe" outcome POSTs the call summary</small></label><input id="cfg_hcp" placeholder="https://…"></div>
+    <div class="cfg"><label>Booked / Needs-Scheduled webhook <small>— "Booked" outcome → Slack / Asana cadence</small></label><input id="cfg_booked" placeholder="https://…"></div>
+    <div class="cfg"><label>AI rewrite endpoint <small>(optional) — POST {draft,painPoints,…}, return {text}. Blank = instant local rewrite.</small></label><input id="cfg_ai" placeholder="https://…"></div>
+    <div class="actions">
+      <button class="btn ghost" id="cfgCancel" style="border-color:var(--line);color:var(--muted)">Cancel</button>
+      <button class="btn" id="cfgSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
