@@ -99,13 +99,27 @@ function swapPronouns(t){
   let s=t; for(const [re,rep] of map) s=s.replace(re,rep); return s;
 }
 
+/* Pick a benefit clause that actually fits the room they named. */
+function roomBenefit(room){
+  const r = room.toLowerCase();
+  if(/guest/.test(r))                         return 'have it guest-ready for whenever company shows up';
+  if(/bath|shower|powder|ensuite|en-suite/.test(r)) return 'make it feel fresh and spotless every time you walk in';
+  if(/bed|master|primary|suite/.test(r))      return 'make it the calm, restful space you unwind in at the end of the day';
+  if(/living|family|great\s*room|den|lounge/.test(r)) return 'make it the room where you can finally relax';
+  if(/kitchen/.test(r))                        return 'make it the clean, welcoming heart of the home';
+  if(/dining/.test(r))                         return 'have it ready for everyone around the table';
+  if(/office|study|desk/.test(r))              return 'give you a clear space you can actually focus in';
+  if(/floor|baseboard|tile/.test(r))           return 'get them looking brand new';
+  return "make sure it's the part of your home you're proudest of";
+}
+
 function buildParagraph(){
   const first = State.contact.first.trim();
   const namePrefix = first ? first + ', ' : '';
   const keys = activePainKeys();
   const room = State.favroom.trim();
   const roomLine = room
-    ? `You told me ${room} matters most to you, so we're going to take that room top to bottom and make it the place you go to recharge. `
+    ? `You told me ${room} matters most to you, so we're going to take it top to bottom and ${roomBenefit(room)}. `
     : '';
   const followUp = `And when we're done, I'm personally following up to make sure it got the white-glove treatment.`;
 
@@ -391,7 +405,6 @@ function wire(){
   $('#appt_window') && $('#appt_window').addEventListener('change',e=>{State.appt.window=e.target.value; renderBindings();});
 
   // discovery
-  $('#d_reason') && $('#d_reason').addEventListener('input',e=>{State.reason=e.target.value; renderRephrase();});
   $('#d_favroom') && $('#d_favroom').addEventListener('input',e=>{State.favroom=e.target.value; renderRephrase(); renderBindings();});
   $('#painFree') && $('#painFree').addEventListener('input',e=>{State.painFree=e.target.value; onPainsChanged();});
 
