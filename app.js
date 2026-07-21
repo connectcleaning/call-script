@@ -260,6 +260,12 @@ function renderBindings(){
     setSlot('slot-initial', b&&b[HOME_SERVICE_INDEX.initial]);
     setSlot('slot-biweekly',b&&b[HOME_SERVICE_INDEX.biweekly]);
   }
+  // window package prices inside the read-aloud lines
+  if(State.service==='window'){
+    setSlot('slot-gold',   windowPrice('gold',   State.sqft));
+    setSlot('slot-silver', windowPrice('silver', State.sqft));
+    setSlot('slot-bronze', windowPrice('bronze', State.sqft));
+  }
 }
 function setSlot(cls,val){
   $$('.'+cls).forEach(el=> el.textContent = (val? money(val):'_____'));
