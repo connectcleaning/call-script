@@ -11,6 +11,7 @@ const State = {
   pains: new Set(),
   painFree: '',
   favroom: '',
+  fiveStar: '',
   reason: '',
   windowPkg: 'silver',
   addons: new Set(),
@@ -121,7 +122,12 @@ function buildParagraph(){
   const roomLine = room
     ? `You told me ${room} matters most to you, so we're going to take it top to bottom and ${roomBenefit(room)}. `
     : '';
+  const five = State.fiveStar.trim().replace(/[.\s]+$/,'');
+  const fiveLine = five
+    ? `We'll also make sure ${five} is taken care of, so it's a 5-star clean for you. `
+    : '';
   const followUp = `And when we're done, I'm personally following up to make sure it got the white-glove treatment.`;
+  const tail = roomLine + fiveLine + followUp;
 
   const empathies = keys.map(k=>painObj(k)?.empathy).filter(Boolean);
   if(empathies.length){
@@ -129,7 +135,7 @@ function buildParagraph(){
     const empathyClause = empathies.length===1 ? empathies[0] : empathies.slice(0,2).join(' and also ');
     let p = capFirst(`${namePrefix}I know you've been ${empathyClause}. `);
     p += `Our whole goal is to give you your time back — so you can ${benefit}. `;
-    return p + roomLine + followUp;
+    return p + tail;
   }
 
   // A typed phrase that didn't match a preset pain point.
@@ -138,12 +144,12 @@ function buildParagraph(){
     const swapped = swapPronouns(raw);
     let p = capFirst(`${namePrefix}I know ${swapped} — and that's a lot to have on your plate right now. `);
     p += `Our whole goal is to take the cleaning off your list so it's one less thing you have to think about. `;
-    return p + roomLine + followUp;
+    return p + tail;
   }
 
   // Nothing captured yet.
   let p = capFirst(`${namePrefix}Our whole goal is to give you your time back, so you can focus on everything else you've got going on instead of the cleaning. `);
-  return p + roomLine + followUp;
+  return p + tail;
 }
 
 /* Step-3 products question adapts to pets / kids-baby pain points. */
@@ -322,7 +328,7 @@ function callSummary(outcome){
     squareFeet:State.sqft,
     bucket: b? `${b[0]}-${b[1]}`:null,
     painPoints: activePainKeys().map(k=>painObj(k)?.label).filter(Boolean),
-    painPhrase: State.painFree, favoriteRoom:State.favroom, reason:State.reason,
+    painPhrase: State.painFree, favoriteRoom:State.favroom, fiveStarMustHave:State.fiveStar, reason:State.reason,
     closingParagraph: buildParagraph(),
     addons:[...State.addons], windowPackage: State.service==='window'?State.windowPkg:null,
     windowMode: State.service==='window'?State.winMode:null,
@@ -406,6 +412,7 @@ function wire(){
 
   // discovery
   $('#d_favroom') && $('#d_favroom').addEventListener('input',e=>{State.favroom=e.target.value; renderRephrase(); renderBindings();});
+  $('#d_fivestar') && $('#d_fivestar').addEventListener('input',e=>{State.fiveStar=e.target.value; renderRephrase();});
   $('#painFree') && $('#painFree').addEventListener('input',e=>{State.painFree=e.target.value; onPainsChanged();});
 
   // window package select
