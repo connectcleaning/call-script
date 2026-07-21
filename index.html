@@ -13,7 +13,8 @@
   <div class="inner">
     <div class="brand">
       <img id="brandLogo" src="assets/logo.png" alt="Connect Cleaning"
-           onload="this.closest('.brand').classList.add('has-logo')" onerror="this.remove()">
+           onload="this.closest('.brand').classList.add('has-logo')"
+           onerror="if(!this.dataset.f){this.dataset.f=1;this.src='assets/LOGO%202%20TRANSPARENT%20WHITE.png';}else{this.remove();}">
       <span class="dot"></span><span class="brand-label">Connect&nbsp;Cleaning</span>
     </div>
     <div class="contact-grid">
