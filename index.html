@@ -69,13 +69,17 @@
         <div class="step-h">2 · Discovery — find the real reason &amp; what it's costing them</div>
         <p class="note">This is where the sale is made. If they haven't said why they're calling:</p>
         <div class="read">What made you decide to get the home cleaned right now?</div>
-        <div class="row"><label>Their reason / situation (feeds the closing paragraph)</label>
+        <div class="row"><label>Their reason / situation (in their own words)</label>
           <input id="d_reason" placeholder="e.g. guests coming for the holidays"></div>
+        <div class="row">
+          <label>Pain points — tap any that fit (these tailor the closing you'll read in step 4)</label>
+          <div class="chips" id="painChips"></div>
+        </div>
+        <div class="row"><label>…or type it in their words</label>
+          <input id="painFree" placeholder='e.g. "upcoming knee surgery"'></div>
         <p class="note">Dig into the consequence — let them feel the cost. Pick one:</p>
-        <ul class="bullets">
-          <li>"If it stayed the way it is now, what would that look like when the guests arrive / when you're trying to rest?"</li>
-          <li>"How long has this been on your list that you keep meaning to get to?"</li>
-        </ul>
+        <div class="read">If it stayed the way it is now, what would that look like when the guests arrive / when you're trying to rest?</div>
+        <div class="read">How long has this been on your list that you keep meaning to get to?</div>
         <div class="read">What have you already tried?</div>
         <details class="branch"><summary>▸ If they used a cleaning company before</summary>
           <div class="read">What did you like, and what would you want done differently this time?</div></details>
@@ -97,22 +101,23 @@
       <div class="step">
         <div class="step-h">3 · Present value as questions, not a speech</div>
         <div class="read">Sounds good. Let me put your estimate together. While I do, can I ask a couple quick things so I know we're the right fit?</div>
-        <ul class="bullets">
-          <li>"You mentioned the kids and the dog are home a lot — does it matter that the products we use around them are non-toxic and safe?"</li>
-          <li>"Would it be more convenient to have a team of two or three in and out efficiently, rather than one person here most of the day?"</li>
-          <li>"How important is it that everyone who enters your home is background checked, and that we're licensed, bonded, and insured?"</li>
-        </ul>
+        <p class="note">Turn each strength into a question tied to what they told you — they'll sell themselves:</p>
+        <div class="read">You mentioned the kids and the dog are home a lot — does it matter that the products we use around them are non-toxic and safe?</div>
+        <div class="read">Would it be more convenient to have a team of two or three in and out efficiently, rather than one person here most of the day?</div>
+        <div class="read">How important is it that everyone who enters your home is background checked, and that we're licensed, bonded, and insured?</div>
         <div class="read">That's exactly how we run every job — top to bottom, ceiling fans down to the baseboards, every visit.</div>
         <details class="branch"><summary>▸ If it's a moving clean</summary>
           <div class="read">And since you're moving, we also clean inside the appliances, drawers, and cabinets, so it's completely move-in ready.</div></details>
       </div>
 
       <div class="step">
-        <div class="step-h">4 · Bridge their situation to the service <span class="pill">LIVE</span></div>
-        <p class="note">Select the pain points below (or type a phrase) — the closing paragraph in the panel → rewrites itself instantly. Read it aloud.</p>
-        <div class="chips" id="painChips"></div>
-        <div class="row discovery"><label>…or type it in their words</label>
-          <input id="painFree" placeholder='e.g. "upcoming knee surgery"'></div>
+        <div class="step-h">4 · Bridge — read this, it's tailored to them <span class="pill">LIVE</span></div>
+        <p class="note">This fills in automatically from the pain points and answers you captured in discovery. Read it as the bridge into pricing.</p>
+        <div class="read tailored" id="rephraseOut"></div>
+        <div class="tailored-tools">
+          <button class="copybtn" id="copyRephrase">⧉ Copy</button>
+          <button class="copybtn" id="aiBtn">✨ AI polish</button>
+        </div>
         <p class="note">Then get a yes on the outcome before any number:</p>
         <div class="read">If we could take all of that off your plate for you, would that make a real difference?</div>
       </div>
@@ -164,10 +169,9 @@ After that most clients land on biweekly, <span class="slot-biweekly slot">_____
       <div class="step discovery">
         <div class="step-h">2 · Discovery</div>
         <div class="read">What made you decide to get the windows done right now?</div>
-        <ul class="bullets">
-          <li>"When the afternoon light comes through, is that when the spots and haze bug you the most?"</li>
-          <li>"How long have the windows been on your list?"</li>
-        </ul>
+        <p class="note">Now the consequence — pick one:</p>
+        <div class="read">When the afternoon light comes through, is that when the spots and haze bug you the most?</div>
+        <div class="read">How long have the windows been on your list?</div>
         <p class="note">SWFL angle: hard water, salt air, love bug season, and pollen build up fast — there's usually real buildup to point to.</p>
         <div class="read">Have you had them done before, or been tackling them yourself?</div>
         <details class="branch"><summary>▸ If DIY</summary><div class="read">How's that been going with the second-story and the exterior panes?</div></details>
@@ -177,10 +181,8 @@ After that most clients land on biweekly, <span class="slot-biweekly slot">_____
       </div>
       <div class="step">
         <div class="step-h">3 · Present value as questions</div>
-        <ul class="bullets">
-          <li>"Just the glass, or the full detail with screens, sills, and frames so they look new — not just wiped down?"</li>
-          <li>"How important is it that whoever's up on a ladder is licensed, bonded, insured, and background checked?"</li>
-        </ul>
+        <div class="read">Just the glass, or the full detail with screens, sills, and frames so they look new — not just wiped down?</div>
+        <div class="read">How important is it that whoever's up on a ladder is licensed, bonded, insured, and background checked?</div>
       </div>
       <div class="step">
         <div class="step-h">4 &amp; 5 · Anchor Gold → land on Silver, guarantee up front</div>
@@ -307,15 +309,6 @@ And if you're really just after the curb view, Bronze is exterior windows and sc
     <div class="card">
       <h3>Live pricing</h3>
       <div class="price-list" id="priceList"></div>
-    </div>
-
-    <div class="card">
-      <h3>Closing paragraph <span class="pill">AI</span></h3>
-      <div class="rephrase-box" id="rephraseOut"></div>
-      <div style="display:flex;gap:6px">
-        <button class="copybtn" id="copyRephrase">⧉ Copy</button>
-        <button class="copybtn" id="aiBtn">✨ AI polish</button>
-      </div>
     </div>
   </aside>
 </div>

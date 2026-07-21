@@ -50,8 +50,16 @@ input,select,textarea{font:inherit}
 .step{border-left:3px solid var(--accent);padding-left:14px;margin:18px 0}
 .step:first-child{margin-top:4px}
 .step-h{font-weight:700;color:var(--navy);font-size:13px;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
-.read{color:var(--read);font-weight:600;font-size:16px;background:#eef7f6;border-radius:9px;padding:11px 14px;margin:8px 0;border:1px solid #d6ebe8}
-.read:before{content:"🗣  ";opacity:.5}
+/* Spoken lines — the CSR reads these aloud. Made deliberately loud. */
+.read{position:relative;color:var(--read);font-weight:600;font-size:16px;line-height:1.5;
+  background:#e9f6f3;border:1px solid #cfe8e4;border-left:5px solid var(--accent);
+  border-radius:9px;padding:15px 14px 13px 15px;margin:14px 0 10px}
+.read:before{content:"SAY";position:absolute;top:-9px;left:12px;background:var(--accent);
+  color:#fff;font-size:10px;font-weight:800;letter-spacing:.8px;padding:2px 8px;border-radius:5px;
+  box-shadow:0 1px 2px rgba(11,125,114,.35)}
+.read.tailored{border-left-color:var(--gold);background:#fbf6ea;border-color:#eeddb8;white-space:pre-wrap}
+.read.tailored:before{content:"SAY \2014 auto-tailored";background:var(--gold);box-shadow:0 1px 2px rgba(200,145,42,.35)}
+.tailored-tools{display:flex;gap:6px;margin:2px 0 4px}
 .note{color:var(--muted);font-style:italic;font-size:13.5px;margin:6px 0}
 .branch{border-left:3px solid var(--navy-2);background:#f3f7fb;border-radius:0 8px 8px 0;padding:9px 12px;margin:8px 0}
 .branch summary{cursor:pointer;font-weight:600;color:var(--navy-2);font-size:13.5px}
