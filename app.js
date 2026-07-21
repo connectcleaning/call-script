@@ -23,7 +23,12 @@ function loadCfg(){
   try { return Object.assign(defaultCfg(), JSON.parse(localStorage.getItem(CFG_KEY)||'{}')); }
   catch(e){ return defaultCfg(); }
 }
-function defaultCfg(){ return { ghlUrl:'', sqftUrl:'', hcpUrl:'', bookedUrl:'', aiUrl:'' }; }
+function defaultCfg(){
+  // Deployed on Vercel, the app talks to its own /api/* routes by default.
+  // sqftUrl stays blank so the friendly property-search fallback keeps working
+  // until a property-data provider key is added.
+  return { ghlUrl:'/api/ghl', sqftUrl:'', hcpUrl:'/api/estimate', bookedUrl:'/api/booked', aiUrl:'' };
+}
 function saveCfg(){ localStorage.setItem(CFG_KEY, JSON.stringify(CFG)); }
 
 /* ---------- tiny helpers ---------- */
@@ -36,8 +41,14 @@ function toast(msg, isErr){
 }
 async function postJSON(url, payload){
   const r = await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-  if(!r.ok) throw new Error('HTTP '+r.status);
-  const ct=r.headers.get('content-type')||''; return ct.includes('json')? r.json() : {};
+  const ct=r.headers.get('content-type')||'';
+  const body = ct.includes('json') ? await r.json().catch(()=>({})) : {};
+  if(!r.ok){
+    const msg = body.error || ('HTTP '+r.status);
+    const detail = body.detail ? ' — '+(typeof body.detail==='string'?body.detail:JSON.stringify(body.detail)) : '';
+    throw new Error(msg+detail);
+  }
+  return body;
 }
 function copyText(txt){
   if(navigator.clipboard) return navigator.clipboard.writeText(txt);

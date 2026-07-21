@@ -40,8 +40,29 @@ python3 -m http.server 8080      # → http://localhost:8080
 npx serve .
 ```
 
-**Deploy for the whole team** (free, gives a shareable URL): drop the folder on
-Netlify, Vercel, Cloudflare Pages, or GitHub Pages. It's all static files.
+**Deploy for the whole team (Vercel — recommended).** The `api/` folder holds
+serverless functions, so Vercel hosts both the UI *and* the integration proxy in
+one project. The app calls its own `/api/*` routes by default — no URLs to paste.
+
+1. Deploy the project to Vercel (this repo, or the generated file tree).
+2. In **Vercel → Project → Settings → Environment Variables**, add:
+
+   | Variable | For | Required |
+   |---|---|---|
+   | `GHL_TOKEN` | GHL Private Integration token (`contacts.write`) | for Save-to-GHL |
+   | `GHL_LOCATION_ID` | GHL sub-account / location id | for Save-to-GHL |
+   | `SLACK_WEBHOOK` | Needs-Scheduled channel webhook | optional (Booked) |
+   | `ASANA_TOKEN` / `ASANA_PROJECT` | Asana PAT + project gid | optional (Booked) |
+   | `SQFT_API_KEY` | property-data provider key | optional (sq-ft lookup) |
+   | `HCP_TOKEN` | Housecall Pro token | optional (Maybe estimate) |
+
+3. Redeploy so the vars take effect. **Save to GHL** now works with no further config.
+
+`api/ghl.js` and `api/booked.js` are complete; `api/sqft.js` and `api/estimate.js`
+have the shape ready and a marked spot to drop in your provider / HCP call.
+
+Also works on Netlify, Cloudflare Pages, or GitHub Pages for the **static UI**, but
+those don't run the `api/` functions — you'd host the proxy separately there.
 
 ---
 
