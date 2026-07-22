@@ -43,8 +43,31 @@
       </details>
     </section>
 
+    <!-- 1 · Greeting + service clarification -->
+    <section class="card">
+      <div class="step">
+        <div class="step-h">Greeting</div>
+        <p class="note">Answer with a smile. It genuinely changes how you sound.</p>
+        <div class="read">Hi, thanks for calling Connect Cleaning! This is _______. How can I help you today?</div>
+        <details class="branch"><summary>▸ If the service isn't clear</summary>
+          <div class="read">And what can we help you with — house cleaning, window cleaning, pressure washing, or something else?</div>
+        </details>
+        <p class="note">Once you know what they need, pick the service tab below — then collect their info.</p>
+      </div>
+    </section>
+
+    <!-- 2 · Service selection -->
+    <div class="tabs">
+      <button class="tab active" data-svc="house">House Cleaning</button>
+      <button class="tab" data-svc="window">Window Cleaning</button>
+      <button class="tab" data-svc="airbnb">Airbnb / Turnover</button>
+      <button class="tab" data-svc="pressure">Pressure Washing</button>
+      <button class="tab" data-svc="commercial">Commercial / HOA</button>
+    </div>
+
+    <!-- 3 · Contact info -->
     <section class="card contact-card">
-      <h3 class="card-h">Caller info <span class="card-h-sub">— kept as you switch between services</span></h3>
+      <h3 class="card-h">Caller info <span class="card-h-sub">— "let me get you set up." Kept as you switch between services.</span></h3>
       <div class="contact-grid2">
         <div class="fld2"><label>First name</label><input id="c_first" placeholder="First" autocomplete="off">
           <span class="fld-hint">"Can I start with your name?"</span></div>
@@ -61,28 +84,7 @@
         <button class="btn" id="btnLookup">⌂ Look up sq ft from address</button>
         <button class="btn outline" id="btnSaveContact">Save to GHL</button>
       </div>
-    </section>
-
-    <div class="tabs">
-      <button class="tab active" data-svc="house">House Cleaning</button>
-      <button class="tab" data-svc="window">Window Cleaning</button>
-      <button class="tab" data-svc="airbnb">Airbnb / Turnover</button>
-      <button class="tab" data-svc="pressure">Pressure Washing</button>
-      <button class="tab" data-svc="commercial">Commercial / HOA</button>
-    </div>
-
-    <!-- Opening (shared) -->
-    <section class="card">
-      <div class="step">
-        <div class="step-h">All calls — start here</div>
-        <p class="note">Answer with a smile. It genuinely changes how you sound.</p>
-        <div class="read">Hi, thanks for calling Connect Cleaning! This is _______. How can I help you today?</div>
-        <details class="branch"><summary>▸ If the service isn't clear</summary>
-          <div class="read">And what can we help you with — house cleaning, window cleaning, pressure washing, or something else?</div>
-        </details>
-        <div class="read">Wonderful — let me get you set up. Can I start with your first and last name?</div>
-        <p class="note">Fill the <b>Caller info</b> card above as you go (the prompt for each field is right under it), then hit <b>⌂ Look up sq ft</b>. Get all five before moving into the service section — if the call drops, this is what lets you follow up.</p>
-      </div>
+      <p class="note">Get all five before moving into the service steps below — if the call drops, this is what lets you follow up.</p>
     </section>
 
     <!-- ===================== HOUSE CLEANING ===================== -->
