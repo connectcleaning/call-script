@@ -31,7 +31,7 @@ input,select,textarea{font:inherit}
 .addr-row .mini{position:absolute;right:4px;top:20px;display:flex;gap:3px}
 .mini button{border:none;background:#1c4a72;color:#cfe6ff;border-radius:6px;padding:3px 6px;font-size:11px}
 .mini button:hover{background:var(--accent)}
-.top-actions{display:flex;gap:8px;align-items:center}
+.top-actions{display:flex;gap:8px;align-items:center;margin-left:auto}
 .btn{border:none;border-radius:9px;padding:9px 14px;font-weight:600;background:var(--accent);color:#fff}
 .btn:hover{background:var(--accent-d)}
 .btn.ghost{background:transparent;border:1px solid #3a5f80;color:#cfe6ff}
@@ -61,14 +61,43 @@ input,select,textarea{font:inherit}
 .how-list li{margin:6px 0;font-size:13.5px;line-height:1.5}
 .how-tip{margin:8px 0 0;font-size:12.5px;color:var(--muted);font-style:italic}
 
+/* contact-info card in the body */
+.card-h{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--navy);font-weight:700}
+.card-h-sub{font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted);font-size:12px}
+.contact-grid2{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.fld2{display:flex;flex-direction:column;gap:3px;min-width:0}
+.fld2 label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.fld2 input{border:1px solid var(--line);border-radius:8px;padding:9px 10px;width:100%}
+.fld2 input:focus{outline:2px solid var(--accent);border-color:transparent}
+.addr2{grid-column:1 / -1}
+.contact-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn.outline{background:#fff;border:1px solid var(--accent);color:var(--accent-d)}
+.btn.outline:hover{background:#eef7f6}
+@media(max-width:680px){.contact-grid2{grid-template-columns:repeat(2,1fr)}}
+
 /* residential / commercial segmented control */
 .seg{display:inline-flex;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:2px}
+.seg.small{border-radius:8px}
 .winmode{border:none;background:#fff;color:var(--muted);padding:9px 18px;font-weight:700}
 .winmode.active{background:var(--accent);color:#fff}
 
 /* appointment inputs in the rail */
 .rail-lbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:8px 0 3px}
 .appt-input{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-size:14px}
+
+/* discount panel */
+.disc-row{display:flex;gap:8px;margin-bottom:8px}
+.disc-btn{flex:1;border:none;border-radius:8px;background:var(--accent);color:#fff;font-weight:700;padding:9px 10px;font-size:13px}
+.disc-btn:hover{background:var(--accent-d)}
+.disc-btn.on{box-shadow:0 0 0 3px rgba(15,157,143,.3)}
+.disc-btn.ghost{background:#fff;border:1px solid var(--line);color:var(--muted);flex:0 0 auto;padding:9px 12px}
+.disc-custom{display:flex;gap:6px;align-items:center}
+.disc-custom .seg.small{margin:0}
+.disctype{border:none;background:#fff;color:var(--muted);padding:8px 11px;font-weight:800}
+.disctype.active{background:var(--navy);color:#fff}
+.disc-custom .appt-input{flex:1;min-width:0}
+.disc-banner{background:var(--gold);color:#fff;font-weight:700;font-size:12px;border-radius:7px;padding:5px 9px;margin-bottom:8px;text-align:center}
+.was{color:var(--muted);text-decoration:line-through;font-weight:600;font-size:13px;margin-right:4px}
 
 /* cards & script */
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;margin-bottom:14px}

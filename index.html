@@ -17,17 +17,7 @@
            onerror="if(!this.dataset.f){this.dataset.f=1;this.src='assets/LOGO%202%20TRANSPARENT%20WHITE.png';}else{this.remove();}">
       <span class="dot"></span><span class="brand-label">Connect&nbsp;Cleaning</span>
     </div>
-    <div class="contact-grid">
-      <div class="fld"><label>First name</label><input id="c_first" placeholder="First" autocomplete="off"></div>
-      <div class="fld"><label>Last name</label><input id="c_last" placeholder="Last" autocomplete="off"></div>
-      <div class="fld"><label>Phone</label><input id="c_phone" placeholder="(239) …" autocomplete="off"></div>
-      <div class="fld"><label>Email</label><input id="c_email" placeholder="name@email.com" autocomplete="off"></div>
-      <div class="fld addr-row"><label>Address</label><input id="c_address" placeholder="Street, city" autocomplete="off">
-        <div class="mini"><button id="btnLookup" title="Look up square footage from address">⌂ sq ft</button></div>
-      </div>
-    </div>
     <div class="top-actions">
-      <button class="btn" id="btnSaveContact">Save&nbsp;to&nbsp;GHL</button>
       <button class="gear" id="gear" title="Integration settings">⚙</button>
     </div>
   </div>
@@ -53,6 +43,21 @@
       </details>
     </section>
 
+    <section class="card contact-card">
+      <h3 class="card-h">Caller info <span class="card-h-sub">— kept as you switch between services</span></h3>
+      <div class="contact-grid2">
+        <div class="fld2"><label>First name</label><input id="c_first" placeholder="First" autocomplete="off"></div>
+        <div class="fld2"><label>Last name</label><input id="c_last" placeholder="Last" autocomplete="off"></div>
+        <div class="fld2"><label>Phone</label><input id="c_phone" placeholder="(239) 555-0123" autocomplete="off"></div>
+        <div class="fld2"><label>Email</label><input id="c_email" placeholder="name@email.com" autocomplete="off"></div>
+        <div class="fld2 addr2"><label>Address</label><input id="c_address" placeholder="Street address, city" autocomplete="off"></div>
+      </div>
+      <div class="contact-actions">
+        <button class="btn" id="btnLookup">⌂ Look up sq ft from address</button>
+        <button class="btn outline" id="btnSaveContact">Save to GHL</button>
+      </div>
+    </section>
+
     <div class="tabs">
       <button class="tab active" data-svc="house">House Cleaning</button>
       <button class="tab" data-svc="window">Window Cleaning</button>
@@ -70,11 +75,13 @@
         <details class="branch"><summary>▸ If the service isn't clear</summary>
           <div class="read">And what can we help you with — house cleaning, window cleaning, pressure washing, or something else?</div>
         </details>
-        <p class="note">Collect all five up top (fields above): first, last, phone, email, address. If the call drops, this is what lets you follow up.</p>
+        <div class="read">Wonderful — let me get you set up. Can I start with your first and last name?</div>
+        <p class="note">Fill in the <b>Caller info</b> card above as you go: first, last, phone, email, address. If the call drops, this is what lets you follow up.</p>
         <ul class="bullets">
+          <li><b>Name</b> — get both first and last name for the file.</li>
           <li><b>Phone</b> — "Is this the best number to reach you at?" Repeat it back from your call display to catch typos.</li>
           <li><b>Email</b> — "We send receipts and estimates through email, may I have yours?"</li>
-          <li><b>Address</b> — "I can usually find the home details I need for your estimate online. What's your address?" → then hit <b>⌂ sq ft</b>.</li>
+          <li><b>Address</b> — "I can usually find the home details I need for your estimate online. What's your address?" → then hit <b>⌂ Look up sq ft</b>.</li>
         </ul>
       </div>
     </section>
@@ -97,8 +104,8 @@
         </div>
         <div class="row"><label>Something else? Type it in their words</label>
           <input id="painFree" placeholder='e.g. "upcoming knee surgery"'></div>
-        <p class="note">Dig into the consequence — let them feel the cost. Pick one:</p>
-        <div class="read">If it stayed the way it is now, what would that look like when the guests arrive / when you're trying to rest?</div>
+        <p class="note">Dig into the consequence — let them feel the cost (this first line adapts to the reasons you picked):</p>
+        <div class="read" id="q-consequence">If it stayed the way it is now, how would you feel walking in a week from now — is that something you want to keep dealing with?</div>
         <div class="read">How long has this been on your list that you keep meaning to get to?</div>
         <div class="read">What have you already tried?</div>
         <details class="branch"><summary>▸ If they used a cleaning company before</summary>
@@ -107,7 +114,7 @@
           <div class="read">Why do you think that hasn't stuck?</div></details>
         <details class="branch"><summary>▸ If they only want a partial clean (bathrooms / floors / baseboards)</summary>
           <p class="note">Don't lock into the small job. Give them a judgment-free way to admit the rest slips:</p>
-          <div class="read">Makes sense on the bathrooms and floors. And the rest — the dusting, cabinets, baseboards — are you keeping up with that yourself, or is that the kind of thing that tends to pile up?</div>
+          <div class="read">Ok, it sounds like you just want a few areas cleaned — that makes sense. And the rest — the dusting, cabinets, baseboards — are you keeping up with that yourself, or is that the kind of thing that tends to pile up?</div>
           <p class="note">If they admit it's slipping, go to the widening trial close:</p>
           <div class="read">If we could just keep the whole home clean for you, would that take a weight off your shoulders?</div>
           <p class="note">If they hold firm on two rooms, book the two rooms and earn the rest later. Never push past a clear no.</p>
@@ -128,7 +135,7 @@
         <div class="read" id="q-products">Does it matter to you that the company you choose uses eco-friendly, non-toxic products that are safe for you and everyone in your home?</div>
         <div class="read">Would it be more convenient to have a team of two or three in and out efficiently, rather than one person there most of the day?</div>
         <div class="read">How important is it that everyone who enters your home is background checked, and that we're licensed, bonded, and insured?</div>
-        <div class="read">That's exactly how we run every job — top to bottom, ceiling fans down to the baseboards, every visit.</div>
+        <div class="read">That's exactly how we run every job — we hold our team to a high standard, and we'll clean your home top to bottom, ceiling fans down to the baseboards and floors, every visit.</div>
         <details class="branch" id="branch-moving"><summary>▸ If it's a moving clean (auto-opens when "moving" is a pain point)</summary>
           <div class="read">And since you're moving, we also clean inside the appliances, drawers, and cabinets, so it's completely move-in ready.</div></details>
       </div>
@@ -160,9 +167,11 @@ After that most clients land on biweekly, <span class="slot-biweekly slot">_____
 
       <div class="step">
         <div class="step-h">6 · Schedule with urgency tied to their reason</div>
-        <div class="read"><span class="slot-name slot">[First name]</span>, I can get your first cleaning in before your guests arrive / within a week. Would a morning or an afternoon work better?</div>
-        <p class="note">Set the day &amp; arrival window in the panel → — it fills into your confirmation and close.</p>
+        <div class="read"><span class="slot-name slot">[First name]</span>, I can get your first cleaning in <span class="slot-urgency slot">within a week</span>. Would a morning or an afternoon work better?</div>
+        <div class="read js-twodays hidden">I've got <span class="slot-day slot">[day]</span> or <span class="slot-day2 slot">[second day]</span> — which one works better for you?</div>
+        <p class="note">Set the urgency, day(s) &amp; arrival window in the panel → — they fill in here.</p>
         <div class="read">Perfect — I've got you down for <span class="slot-day slot">[day]</span>, with a <span class="slot-window slot">[arrival window]</span>.</div>
+        <div class="read js-reminder hidden">We'll send you a confirmation text now, and since it's a few days out, we'll also send a reminder two days before so it's easy to plan around.</div>
       </div>
       <div class="step">
         <div class="step-h">7 · Confirm payment</div>
@@ -209,8 +218,8 @@ After that most clients land on biweekly, <span class="slot-biweekly slot">_____
       <div class="win-resi">
         <div class="step">
           <div class="step-h">Know your three packages cold</div>
-          <p class="note"><b>Gold</b> (anchor): interior + exterior, screens removed &amp; cleaned, tracks, sills &amp; frames, PLUS whole-house soft wash.<br>
-          <b>Silver</b> (most popular — recommend): interior + exterior, screens cleaned, sills &amp; frames. No tracks/soft wash.<br>
+          <p class="note"><b>Gold</b> (most complete): interior + exterior, screens removed &amp; cleaned, tracks, sills &amp; frames, PLUS whole-house soft wash.<br>
+          <b>Silver</b> (most popular): interior + exterior, screens cleaned, sills &amp; frames. No tracks/soft wash.<br>
           <b>Bronze</b> (curb view): exterior windows + screens only.<br>
           Minimum job is <b>$197</b>. Crew of one or two. If asked how long: "a few factors affect it, plan for at least a few hours." Never give a firm time.</p>
         </div>
@@ -227,7 +236,7 @@ After that most clients land on biweekly, <span class="slot-biweekly slot">_____
           <div class="read">How long have the windows been on your to-do list?</div>
           <p class="note">SWFL angle: hard water, salt air, love bug season, and pollen build up fast — there's usually real buildup to point to.</p>
           <div class="read">Have you had them done before, or been tackling them yourself?</div>
-          <details class="branch"><summary>▸ If DIY</summary><div class="read">How's that been going with the second-story and the exterior panes?</div></details>
+          <details class="branch"><summary>▸ If DIY</summary><div class="read">How's that been going with the exterior panes and any higher, harder-to-reach windows?</div></details>
           <details class="branch"><summary>▸ If exterior-only (Bronze)</summary>
             <div class="read">Makes sense — the outside is what everyone sees from the street. When you're inside looking out, do the interior panes bug you too, or is it mainly the curb view you're after?</div></details>
         </div>
@@ -239,16 +248,27 @@ After that most clients land on biweekly, <span class="slot-biweekly slot">_____
         <div class="step">
           <div class="step-h">4 &amp; 5 · Anchor Gold → land on Silver, guarantee up front</div>
           <p class="note">Live package pricing is in the panel → ($197 minimum applied automatically).</p>
-          <div class="read">The most complete is our Gold package — full interior and exterior, screens taken out and cleaned, tracks cleaned, sills and frames detailed, plus a whole-house soft wash. A lot of people add that while we're already out there. For your home, that's <span class="slot-gold slot">_____</span>.
-Most people go with Silver, and it's the one I'd point you to — same interior and exterior windows, screens cleaned, sills and frames, minus the tracks and soft wash. That brings it to <span class="slot-silver slot">_____</span>.
+          <div class="read">The most complete is our Gold package — full interior and exterior, screens taken out and cleaned, tracks cleaned, sills and frames detailed, plus a whole-house soft wash. It's the one to go with if you want everything handled in a single visit. For your home, that's <span class="slot-gold slot">_____</span>.
+Our most popular is Silver — same interior and exterior windows, screens cleaned, sills and frames, just without the tracks and soft wash. That's <span class="slot-silver slot">_____</span>.
 And if you're really just after the curb view, Bronze is exterior windows and screens only, at <span class="slot-bronze slot">_____</span>.</div>
           <div class="read">Here's why there's no risk either way: you don't pay until we're done, you've looked them over, and you're happy. If we missed a spot, we make it right before you pay a dollar.</div>
           <div class="read">Which one sounds most like what you're looking for?</div>
         </div>
         <div class="step">
-          <div class="step-h">6–8 · Schedule, payment, close</div>
-          <div class="read"><span class="slot-name slot">[First name]</span>, I can get you on the schedule this week. Mornings or afternoons? … To hold your spot we take a card on file and don't charge it until you're happy.</div>
-          <div class="read">It's been good talking with you — we'll get your windows taken care of on <span class="slot-day slot">[day]</span>, <span class="slot-window slot">[arrival window]</span>.</div>
+          <div class="step-h">6 · Schedule</div>
+          <div class="read"><span class="slot-name slot">[First name]</span>, I can get you on the schedule <span class="slot-urgency slot">within a week</span>. Would a morning or an afternoon work better?</div>
+          <div class="read js-twodays hidden">I've got <span class="slot-day slot">[day]</span> or <span class="slot-day2 slot">[second day]</span> — which one works better for you?</div>
+          <p class="note">Set the day(s) &amp; arrival window in the panel →.</p>
+          <div class="read">Perfect — I've got you down for <span class="slot-day slot">[day]</span>, with a <span class="slot-window slot">[arrival window]</span>.</div>
+        </div>
+        <div class="step">
+          <div class="step-h">7 · Payment — no card on file needed</div>
+          <div class="read">There's no deposit or card on file needed to book — you can pay by card or check once the job's done and you're happy.</div>
+        </div>
+        <div class="step">
+          <div class="step-h">8 · Close</div>
+          <div class="read">It's been good talking with you — we'll get your windows taken care of on <span class="slot-day slot">[day]</span>, <span class="slot-window slot">[arrival window]</span>. Reach out any time before then if anything comes up.</div>
+          <div class="read js-reminder hidden">We'll send you a confirmation text now, and since it's a few days out, we'll also send a reminder two days before.</div>
         </div>
       </div>
     </section>
@@ -363,8 +383,12 @@ And if you're really just after the curb view, Bronze is exterior windows and sc
 
     <div class="card">
       <h3>Appointment</h3>
-      <label class="rail-lbl">Day</label>
+      <label class="rail-lbl">Urgency / their deadline</label>
+      <input id="appt_urgency" class="appt-input" placeholder="e.g. the party Friday">
+      <label class="rail-lbl">Proposed day 1</label>
       <input id="appt_date" type="date" class="appt-input">
+      <label class="rail-lbl">Proposed day 2 (optional)</label>
+      <input id="appt_date2" type="date" class="appt-input">
       <label class="rail-lbl">Arrival window</label>
       <select id="appt_window" class="appt-input">
         <option value="">—</option>
@@ -373,7 +397,24 @@ And if you're really just after the curb view, Bronze is exterior windows and sc
         <option>12–2</option>
         <option>2–4</option>
       </select>
-      <div class="bucket-tag" style="margin-top:8px">Fills into the schedule &amp; close lines.</div>
+      <div class="bucket-tag" style="margin-top:8px">Fills the schedule &amp; close lines. A 2-days-before reminder line appears when the date is 3+ days out.</div>
+    </div>
+
+    <div class="card">
+      <h3>Discount</h3>
+      <div class="disc-row">
+        <button class="disc-btn" id="disc10">10% (objection)</button>
+        <button class="disc-btn ghost" id="discClear">Clear</button>
+      </div>
+      <div class="disc-custom">
+        <div class="seg small">
+          <button class="disctype active" data-t="amt">$</button>
+          <button class="disctype" data-t="pct">%</button>
+        </div>
+        <input id="discVal" type="number" min="0" class="appt-input" placeholder="Amount">
+        <button class="disc-btn" id="discApply">Apply</button>
+      </div>
+      <div class="bucket-tag" id="discNote" style="margin-top:8px">No discount applied.</div>
     </div>
   </aside>
 </div>

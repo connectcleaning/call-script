@@ -16,8 +16,24 @@ const State = {
   windowPkg: 'silver',
   addons: new Set(),
   winMode: 'resi',                 // window cleaning: 'resi' | 'commercial'
-  appt: { date: '', window: '' }   // arrival window: '8–10' | '10–12' | '12–2' | '2–4'
+  appt: { date: '', date2: '', window: '', urgency: '' },
+  discount: { type: 'none', value: 0 }   // 'none' | 'pct' | 'amt'
 };
+
+/* ---------- discount ---------- */
+function disc(p){
+  if(p==null||isNaN(p)) return p;
+  const d=State.discount;
+  if(d.type==='pct') return +(p*(1-d.value/100)).toFixed(2);
+  if(d.type==='amt') return Math.max(0,+(p-d.value).toFixed(2));
+  return p;
+}
+function discountActive(){ return State.discount.type!=='none' && State.discount.value>0; }
+function discountLabel(){
+  const d=State.discount;
+  if(!discountActive()) return '';
+  return d.type==='pct' ? `${d.value}% off applied` : `$${d.value.toFixed(2)} off applied`;
+}
 
 const ARRIVAL_WINDOWS = ['8–10','10–12','12–2','2–4'];
 
@@ -142,7 +158,7 @@ function buildParagraph(){
   const raw = (State.painFree.trim() || State.reason.trim()).replace(/[.\s]+$/,'');
   if(raw){
     const swapped = swapPronouns(raw);
-    let p = capFirst(`${namePrefix}I know ${swapped} — and that's a lot to have on your plate right now. `);
+    let p = capFirst(`${namePrefix}I know how it is with ${swapped} — there's a lot on your plate right now. `);
     p += `Our whole goal is to take the cleaning off your list so it's one less thing you have to think about. `;
     return p + tail;
   }
@@ -172,7 +188,29 @@ function renderMovingBranch(){
   if(activePainKeys().includes('moving')) d.setAttribute('open',''); else d.removeAttribute('open');
 }
 
-function onPainsChanged(){ renderRephrase(); renderProductsQuestion(); renderMovingBranch(); }
+/* The consequence question adapts to the pain points, with a solid default. */
+function renderConsequence(){
+  const el=$('#q-consequence'); if(!el) return;
+  const k=activePainKeys();
+  let t;
+  if(k.includes('guests')||k.includes('listing'))
+    t="If it stayed the way it is now, how would that feel when people are walking through the door?";
+  else if(k.includes('surgery'))
+    t="If it stayed the way it is now, how tough would that be to keep up with while you're trying to rest and recover?";
+  else if(k.includes('baby'))
+    t="If it stayed the way it is now, how would that feel to manage on top of everything with a new baby?";
+  else if(k.includes('parent'))
+    t="If it stayed the way it is now, how would that feel on top of everything you're already carrying?";
+  else if(k.includes('moving'))
+    t="If it stayed the way it is now, how would that feel on top of everything else with the move?";
+  else if(k.includes('health'))
+    t="If it stayed the way it is now, how much is the dust and buildup bothering you day to day?";
+  else
+    t="If it stayed the way it is now, how would you feel walking in a week from now — is that something you want to keep dealing with?";
+  el.textContent=t;
+}
+
+function onPainsChanged(){ renderRephrase(); renderProductsQuestion(); renderConsequence(); renderMovingBranch(); }
 
 function renderRephrase(){
   $('#rephraseOut').textContent = buildParagraph();
@@ -195,6 +233,16 @@ async function aiPolish(){
   finally{ btn.textContent=old; btn.disabled=false; }
 }
 
+/* Price cell: shows the discounted amount, with the original struck through. */
+function amtHtml(price){
+  if(price==null||isNaN(price)) return money(price);
+  if(!discountActive()) return money(price);
+  return `<span class="was">${money(price)}</span> ${money(disc(price))}`;
+}
+function discBanner(){
+  return discountActive() ? `<div class="disc-banner">${discountLabel()}</div>` : '';
+}
+
 /* ---------- render: pricing rail ---------- */
 function renderPricing(){
   const list=$('#priceList'); const tag=$('#bucketTag');
@@ -215,20 +263,20 @@ function renderPricing(){
     if(State.addons.size){
       const items=[...State.addons].map(k=>ADDONS.find(a=>a.key===k)).filter(Boolean);
       const sum=items.reduce((s,a)=>s+a.price,0);
-      addonHtml=`<div class="price-row"><span class="nm">Add-ons: ${items.map(a=>a.label.split(' ')[0]).join(', ')}</span><span class="amt">${money(sum)}</span></div>`;
+      addonHtml=`<div class="price-row"><span class="nm">Add-ons: ${items.map(a=>a.label.split(' ')[0]).join(', ')}</span><span class="amt">${amtHtml(sum)}</span></div>`;
     }
-    list.innerHTML = rows.map(r=>
-      `<div class="price-row ${r[3]}"><span class="nm">${r[1]}</span><span class="amt">${money(r[2])}</span></div>`
+    list.innerHTML = discBanner() + rows.map(r=>
+      `<div class="price-row ${r[3]}"><span class="nm">${r[1]}</span><span class="amt">${amtHtml(r[2])}</span></div>`
     ).join('') + addonHtml;
   }
   else if(State.service==='window'){
     if(sqft==null||isNaN(sqft)){ tag.textContent=''; list.innerHTML='<div class="empty">Enter square footage to see package pricing.</div>'; return; }
     tag.textContent = `Priced on ${sqft.toLocaleString()} sq ft · $${WINDOW.min} minimum`;
     const order=[['gold','anchor'],['silver','rec'],['bronze','muted-amt']];
-    list.innerHTML = order.map(([k,cls])=>{
+    list.innerHTML = discBanner() + order.map(([k,cls])=>{
       const p=WINDOW.packages[k]; const price=windowPrice(k,sqft);
       const min = price===WINDOW.min ? ' <span class="bucket-tag">(minimum)</span>':'';
-      return `<div class="price-row ${cls}"><span class="nm">${p.label}${min}</span><span class="amt">${money(price)}</span></div>`;
+      return `<div class="price-row ${cls}"><span class="nm">${p.label}${min}</span><span class="amt">${amtHtml(price)}</span></div>`;
     }).join('');
   }
   else {
@@ -249,26 +297,40 @@ function renderBindings(){
   $$('.slot-name').forEach(el=>el.textContent=nm);
   const sq = State.sqft!=null&&!isNaN(State.sqft) ? State.sqft.toLocaleString() : '_____';
   $$('.slot-sqft').forEach(el=>el.textContent=sq);
-  const day = prettyDay(State.appt.date) || '[day]';
-  const win = State.appt.window ? State.appt.window+' arrival' : '[arrival window]';
-  $$('.slot-day').forEach(el=>el.textContent=day);
-  $$('.slot-window').forEach(el=>el.textContent=win);
-  // house pricing slots inside the read-aloud lines
+  // appointment slots
+  $$('.slot-day').forEach(el=>el.textContent = prettyDay(State.appt.date) || '[day]');
+  $$('.slot-day2').forEach(el=>el.textContent = prettyDay(State.appt.date2) || '[second day]');
+  $$('.slot-window').forEach(el=>el.textContent = State.appt.window ? State.appt.window+' arrival' : '[arrival window]');
+  const urg = State.appt.urgency.trim();
+  $$('.slot-urgency').forEach(el=>el.textContent = urg ? 'before '+urg : 'within a week');
+  // house pricing slots inside the read-aloud lines (discount-aware)
   if(State.service==='house'){
     const b=bucketFor(State.sqft);
     setSlot('slot-onetime', b&&b[HOME_SERVICE_INDEX.oneTime]);
     setSlot('slot-initial', b&&b[HOME_SERVICE_INDEX.initial]);
     setSlot('slot-biweekly',b&&b[HOME_SERVICE_INDEX.biweekly]);
   }
-  // window package prices inside the read-aloud lines
   if(State.service==='window'){
     setSlot('slot-gold',   windowPrice('gold',   State.sqft));
     setSlot('slot-silver', windowPrice('silver', State.sqft));
     setSlot('slot-bronze', windowPrice('bronze', State.sqft));
   }
+  renderSchedule();
 }
 function setSlot(cls,val){
-  $$('.'+cls).forEach(el=> el.textContent = (val? money(val):'_____'));
+  $$('.'+cls).forEach(el=> el.textContent = (val? money(disc(val)):'_____'));
+}
+
+/* Show/hide the two-proposed-days line and the 2-day-reminder line. */
+function renderSchedule(){
+  const has2 = !!State.appt.date2 && !!State.appt.date;
+  $$('.js-twodays').forEach(el=>el.classList.toggle('hidden', !has2));
+  let far=false;
+  if(State.appt.date){
+    const d=new Date(State.appt.date+'T00:00:00'); const today=new Date(); today.setHours(0,0,0,0);
+    far = ((d-today)/86400000) > 2;
+  }
+  $$('.js-reminder').forEach(el=>el.classList.toggle('hidden', !far));
 }
 
 /* ---------- service switching ---------- */
@@ -277,6 +339,12 @@ function switchService(svc){
   $$('.tab').forEach(t=>t.classList.toggle('active', t.dataset.svc===svc));
   $$('.svc-section').forEach(s=>s.classList.toggle('hidden', s.dataset.svc!==svc));
   renderPricing(); renderBindings();
+}
+
+function refreshDiscount(){
+  renderPricing(); renderBindings();
+  const note=$('#discNote'); if(note) note.textContent=discountLabel() || 'No discount applied.';
+  const b=$('#disc10'); if(b) b.classList.toggle('on', State.discount.type==='pct' && State.discount.value===10);
 }
 
 /* Window cleaning: residential vs commercial paths */
@@ -338,7 +406,12 @@ function callSummary(outcome){
     closingParagraph: buildParagraph(),
     addons:[...State.addons], windowPackage: State.service==='window'?State.windowPkg:null,
     windowMode: State.service==='window'?State.winMode:null,
-    appointment: { date: State.appt.date||null, arrivalWindow: State.appt.window||null, dayLabel: prettyDay(State.appt.date)||null }
+    appointment: {
+      date: State.appt.date||null, date2: State.appt.date2||null,
+      arrivalWindow: State.appt.window||null, urgency: State.appt.urgency||null,
+      dayLabel: prettyDay(State.appt.date)||null, day2Label: prettyDay(State.appt.date2)||null
+    },
+    discount: discountActive() ? { type:State.discount.type, value:State.discount.value, label:discountLabel() } : null
   };
 }
 async function doOutcome(kind){
@@ -412,9 +485,23 @@ function wire(){
   $$('.tab').forEach(t=>t.addEventListener('click',()=>switchService(t.dataset.svc)));
   // window residential / commercial toggle
   $$('.winmode').forEach(b=>b.addEventListener('click',()=>setWinMode(b.dataset.mode)));
-  // appointment day + arrival window
+  // appointment: urgency, two proposed days, arrival window
+  $('#appt_urgency') && $('#appt_urgency').addEventListener('input',e=>{State.appt.urgency=e.target.value; renderBindings();});
   $('#appt_date') && $('#appt_date').addEventListener('input',e=>{State.appt.date=e.target.value; renderBindings();});
+  $('#appt_date2') && $('#appt_date2').addEventListener('input',e=>{State.appt.date2=e.target.value; renderBindings();});
   $('#appt_window') && $('#appt_window').addEventListener('change',e=>{State.appt.window=e.target.value; renderBindings();});
+
+  // discount controls
+  $('#disc10') && $('#disc10').addEventListener('click',()=>{State.discount={type:'pct',value:10}; if($('#discVal'))$('#discVal').value=''; refreshDiscount();});
+  $('#discClear') && $('#discClear').addEventListener('click',()=>{State.discount={type:'none',value:0}; if($('#discVal'))$('#discVal').value=''; refreshDiscount();});
+  $$('.disctype').forEach(btn=>btn.addEventListener('click',()=>{ $$('.disctype').forEach(x=>x.classList.toggle('active', x===btn)); }));
+  $('#discApply') && $('#discApply').addEventListener('click',()=>{
+    const v=parseFloat($('#discVal').value);
+    const t=($$('.disctype').find(x=>x.classList.contains('active'))||{}).dataset?.t || 'amt';
+    if(isNaN(v)||v<=0){ toast('Enter a discount amount first', true); return; }
+    if(t==='pct' && v>100){ toast('Percent can\'t exceed 100', true); return; }
+    State.discount={type:t,value:v}; refreshDiscount();
+  });
 
   // discovery
   $('#d_favroom') && $('#d_favroom').addEventListener('input',e=>{State.favroom=e.target.value; renderRephrase(); renderBindings();});

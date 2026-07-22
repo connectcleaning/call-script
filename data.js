@@ -74,7 +74,7 @@ const PAIN_POINTS = [
   { key:'parent',   label:'Caring for a parent',         empathy:"caring for your mom",                             benefit:"be present for the people who need you instead of stretched thin" },
   { key:'busy',     label:'Busy with work',              empathy:"slammed with work",                              benefit:"get your evenings and weekends back" },
   { key:'behind',   label:'Overwhelmed / fell behind',   empathy:"feeling like it's gotten away from you a bit",   benefit:"walk in the door and finally exhale" },
-  { key:'moving',   label:'Just moved / moving',         empathy:"in the middle of a move",                        benefit:"start fresh in a place that's completely move-in ready" },
+  { key:'moving',   label:'Moving / move-out / turnover', empathy:"in the middle of a move",                        benefit:"cross the cleaning off your moving list, whether you're settling in or handing over the keys" },
   { key:'health',   label:'Health / allergies',          empathy:"dealing with the dust and allergens",            benefit:"breathe easier in a home that's genuinely clean, not just tidy" },
   { key:'pets',     label:'Pets / pet hair',             empathy:"keeping up with the pet hair",                   benefit:"stop fighting the fur and enjoy your pets instead" }
 ];
