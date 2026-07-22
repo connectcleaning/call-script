@@ -17,22 +17,36 @@ const State = {
   addons: new Set(),
   winMode: 'resi',                 // window cleaning: 'resi' | 'commercial'
   appt: { date: '', date2: '', window: '', urgency: '' },
-  discount: { type: 'none', value: 0 }   // 'none' | 'pct' | 'amt'
+  discount: { type: 'none', value: 0, scope: 'firstclean' }   // type: none|pct|amt · scope: firstclean|all
 };
 
-/* ---------- discount ---------- */
-function disc(p){
-  if(p==null||isNaN(p)) return p;
-  const d=State.discount;
-  if(d.type==='pct') return +(p*(1-d.value/100)).toFixed(2);
-  if(d.type==='amt') return Math.max(0,+(p-d.value).toFixed(2));
-  return p;
-}
+/* ---------- discount ----------
+ * scope 'firstclean' → first/initial clean & one-offs only (custom discounts,
+ *                      e.g. a Facebook coupon). Recurring visits stay full.
+ * scope 'all'        → also applies to recurring visits (the 10% objection).
+ * Window packages are floored at $175 after any discount. */
+const RECURRING_KEYS = new Set(['weekly','biweekly','monthly']);
+const WINDOW_DISCOUNT_FLOOR = 175;
 function discountActive(){ return State.discount.type!=='none' && State.discount.value>0; }
+function discApplies(rowKey){
+  if(!discountActive()) return false;
+  if(State.discount.scope==='all') return true;
+  return !RECURRING_KEYS.has(rowKey);   // firstclean scope skips recurring visits
+}
+function discPrice(price,rowKey,floor){
+  if(price==null||isNaN(price)) return price;
+  if(!discApplies(rowKey)) return price;
+  const d=State.discount;
+  let out = d.type==='pct' ? price*(1-d.value/100) : price-d.value;
+  out = +out.toFixed(2);
+  if(floor!=null) out = Math.max(floor,out);
+  return Math.max(0,out);
+}
 function discountLabel(){
   const d=State.discount;
   if(!discountActive()) return '';
-  return d.type==='pct' ? `${d.value}% off applied` : `$${d.value.toFixed(2)} off applied`;
+  const amt = d.type==='pct' ? `${d.value}% off` : `$${d.value.toFixed(2)} off`;
+  return amt + (d.scope==='all' ? ' — first clean + recurring' : ' — first cleaning only');
 }
 
 const ARRIVAL_WINDOWS = ['8–10','10–12','12–2','2–4'];
@@ -234,10 +248,10 @@ async function aiPolish(){
 }
 
 /* Price cell: shows the discounted amount, with the original struck through. */
-function amtHtml(price){
+function amtHtml(price,rowKey,floor){
   if(price==null||isNaN(price)) return money(price);
-  if(!discountActive()) return money(price);
-  return `<span class="was">${money(price)}</span> ${money(disc(price))}`;
+  if(!discApplies(rowKey)) return money(price);
+  return `<span class="was">${money(price)}</span> ${money(discPrice(price,rowKey,floor))}`;
 }
 function discBanner(){
   return discountActive() ? `<div class="disc-banner">${discountLabel()}</div>` : '';
@@ -263,10 +277,10 @@ function renderPricing(){
     if(State.addons.size){
       const items=[...State.addons].map(k=>ADDONS.find(a=>a.key===k)).filter(Boolean);
       const sum=items.reduce((s,a)=>s+a.price,0);
-      addonHtml=`<div class="price-row"><span class="nm">Add-ons: ${items.map(a=>a.label.split(' ')[0]).join(', ')}</span><span class="amt">${amtHtml(sum)}</span></div>`;
+      addonHtml=`<div class="price-row"><span class="nm">Add-ons: ${items.map(a=>a.label.split(' ')[0]).join(', ')}</span><span class="amt">${money(sum)}</span></div>`;
     }
     list.innerHTML = discBanner() + rows.map(r=>
-      `<div class="price-row ${r[3]}"><span class="nm">${r[1]}</span><span class="amt">${amtHtml(r[2])}</span></div>`
+      `<div class="price-row ${r[3]}"><span class="nm">${r[1]}</span><span class="amt">${amtHtml(r[2], r[0])}</span></div>`
     ).join('') + addonHtml;
   }
   else if(State.service==='window'){
@@ -276,7 +290,7 @@ function renderPricing(){
     list.innerHTML = discBanner() + order.map(([k,cls])=>{
       const p=WINDOW.packages[k]; const price=windowPrice(k,sqft);
       const min = price===WINDOW.min ? ' <span class="bucket-tag">(minimum)</span>':'';
-      return `<div class="price-row ${cls}"><span class="nm">${p.label}${min}</span><span class="amt">${amtHtml(price)}</span></div>`;
+      return `<div class="price-row ${cls}"><span class="nm">${p.label}${min}</span><span class="amt">${amtHtml(price, k, WINDOW_DISCOUNT_FLOOR)}</span></div>`;
     }).join('');
   }
   else {
@@ -306,19 +320,19 @@ function renderBindings(){
   // house pricing slots inside the read-aloud lines (discount-aware)
   if(State.service==='house'){
     const b=bucketFor(State.sqft);
-    setSlot('slot-onetime', b&&b[HOME_SERVICE_INDEX.oneTime]);
-    setSlot('slot-initial', b&&b[HOME_SERVICE_INDEX.initial]);
-    setSlot('slot-biweekly',b&&b[HOME_SERVICE_INDEX.biweekly]);
+    setSlot('slot-onetime', b&&b[HOME_SERVICE_INDEX.oneTime], 'oneTime');
+    setSlot('slot-initial', b&&b[HOME_SERVICE_INDEX.initial], 'initial');
+    setSlot('slot-biweekly',b&&b[HOME_SERVICE_INDEX.biweekly], 'biweekly');
   }
   if(State.service==='window'){
-    setSlot('slot-gold',   windowPrice('gold',   State.sqft));
-    setSlot('slot-silver', windowPrice('silver', State.sqft));
-    setSlot('slot-bronze', windowPrice('bronze', State.sqft));
+    setSlot('slot-gold',   windowPrice('gold',   State.sqft), 'gold',   WINDOW_DISCOUNT_FLOOR);
+    setSlot('slot-silver', windowPrice('silver', State.sqft), 'silver', WINDOW_DISCOUNT_FLOOR);
+    setSlot('slot-bronze', windowPrice('bronze', State.sqft), 'bronze', WINDOW_DISCOUNT_FLOOR);
   }
   renderSchedule();
 }
-function setSlot(cls,val){
-  $$('.'+cls).forEach(el=> el.textContent = (val? money(disc(val)):'_____'));
+function setSlot(cls,val,rowKey,floor){
+  $$('.'+cls).forEach(el=> el.textContent = (val? money(discPrice(val,rowKey,floor)):'_____'));
 }
 
 /* Show/hide the two-proposed-days line and the 2-day-reminder line. */
@@ -411,23 +425,40 @@ function callSummary(outcome){
       arrivalWindow: State.appt.window||null, urgency: State.appt.urgency||null,
       dayLabel: prettyDay(State.appt.date)||null, day2Label: prettyDay(State.appt.date2)||null
     },
-    discount: discountActive() ? { type:State.discount.type, value:State.discount.value, label:discountLabel() } : null
+    discount: discountActive() ? { type:State.discount.type, value:State.discount.value, scope:State.discount.scope, label:discountLabel() } : null
   };
 }
 async function doOutcome(kind){
   const summary=callSummary(kind);
-  // Declined never fires booking/estimate automation — it's just recorded.
-  const url = kind==='booked' ? CFG.bookedUrl : (kind==='estimate' ? CFG.hcpUrl : '');
-  const label = {declined:'Declined',estimate:'Estimate → HCP email',booked:'Booked → Needs-Scheduled cadence'}[kind];
-  if(url){
-    try{ await postJSON(url, summary); toast(label+' sent ✓'); }
-    catch(e){ toast(label+' failed: '+e.message, true); }
-  } else {
-    await copyText(JSON.stringify(summary,null,2));
-    toast(kind==='declined'
-      ? 'Marked declined — call summary copied for your notes'
-      : 'No webhook set for this outcome (Settings) — call summary copied to clipboard');
+  const label = {declined:'Declined',estimate:'Maybe (estimate)',booked:'Booked'}[kind];
+  const parts=[];
+
+  // 1) Always push the contact to GHL (upsert). Booked also creates/updates
+  //    the opportunity in Residential Sales → Needs Scheduled.
+  if(CFG.ghlUrl){
+    try{
+      const nm=`${State.contact.first} ${State.contact.last}`.trim();
+      const opp = kind==='booked'
+        ? { name: (nm||'New booking')+` — ${State.service}` }
+        : null;
+      const r=await postJSON(CFG.ghlUrl,{ ...contactPayload(), createOpportunity: kind==='booked', opportunity: opp });
+      if(kind==='booked' && r.opportunity){
+        parts.push(r.opportunity.ok ? `GHL opp ${r.opportunity.action} → ${r.opportunity.stage}` : 'GHL opp failed');
+      } else parts.push('GHL contact saved');
+    }catch(e){ parts.push('GHL failed: '+e.message); }
   }
+
+  // 2) Outcome-specific webhook: Slack/Asana for Booked, HCP email for Maybe.
+  const url = kind==='booked' ? CFG.bookedUrl : (kind==='estimate' ? CFG.hcpUrl : '');
+  if(url){
+    try{ await postJSON(url, summary); parts.push(kind==='booked'?'Slack/Asana sent':'HCP estimate sent'); }
+    catch(e){ parts.push('webhook failed: '+e.message); }
+  } else if(!CFG.ghlUrl){
+    await copyText(JSON.stringify(summary,null,2));
+    parts.push('summary copied');
+  }
+
+  toast(`${label} — ${parts.join(' · ')||'recorded'}`, parts.some(p=>/failed/.test(p)));
 }
 
 /* ---------- settings modal ---------- */
@@ -492,15 +523,17 @@ function wire(){
   $('#appt_window') && $('#appt_window').addEventListener('change',e=>{State.appt.window=e.target.value; renderBindings();});
 
   // discount controls
-  $('#disc10') && $('#disc10').addEventListener('click',()=>{State.discount={type:'pct',value:10}; if($('#discVal'))$('#discVal').value=''; refreshDiscount();});
-  $('#discClear') && $('#discClear').addEventListener('click',()=>{State.discount={type:'none',value:0}; if($('#discVal'))$('#discVal').value=''; refreshDiscount();});
+  // 10% objection discount applies to recurring too (scope 'all')
+  $('#disc10') && $('#disc10').addEventListener('click',()=>{State.discount={type:'pct',value:10,scope:'all'}; if($('#discVal'))$('#discVal').value=''; refreshDiscount();});
+  $('#discClear') && $('#discClear').addEventListener('click',()=>{State.discount={type:'none',value:0,scope:'firstclean'}; if($('#discVal'))$('#discVal').value=''; refreshDiscount();});
   $$('.disctype').forEach(btn=>btn.addEventListener('click',()=>{ $$('.disctype').forEach(x=>x.classList.toggle('active', x===btn)); }));
+  // custom discounts apply to the first/initial clean only (scope 'firstclean')
   $('#discApply') && $('#discApply').addEventListener('click',()=>{
     const v=parseFloat($('#discVal').value);
     const t=($$('.disctype').find(x=>x.classList.contains('active'))||{}).dataset?.t || 'amt';
     if(isNaN(v)||v<=0){ toast('Enter a discount amount first', true); return; }
     if(t==='pct' && v>100){ toast('Percent can\'t exceed 100', true); return; }
-    State.discount={type:t,value:v}; refreshDiscount();
+    State.discount={type:t,value:v,scope:'firstclean'}; refreshDiscount();
   });
 
   // discovery
